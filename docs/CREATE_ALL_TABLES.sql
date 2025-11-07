@@ -363,7 +363,7 @@ CREATE POLICY "Users can update their own data" ON users
 DROP POLICY IF EXISTS "Users can create their own account" ON users;
 CREATE POLICY "Users can create their own account" ON users
   FOR INSERT
-  WITH CHECK (auth.uid() = id);
+  WITH CHECK (auth.uid()::text = id::text);
 
 -- Businesses: Read active businesses
 DROP POLICY IF EXISTS "Anyone can read active businesses" ON businesses;

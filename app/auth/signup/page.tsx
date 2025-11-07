@@ -55,28 +55,32 @@ export default function SignUpPage() {
       })
 
       if (authError || !authData.user) {
+        console.error('Auth error:', authError)
         setError(
           authError?.message || 'Failed to create account'
         )
         return
       }
 
-      // Create user record in database
-      const { error: dbError } = await supabase
-        .from('users')
-        .insert([
-          {
-            id: authData.user.id,
-            email: data.email,
-            name: data.name,
-            role: data.userType,
-            verified: false,
-            created_at: new Date().toISOString(),
-          },
-        ])
+      console.log('User created in auth:', authData.user.id)
 
-      if (dbError) {
-        setError('Failed to complete registration')
+      // Create user record in database via API endpoint
+      const createUserResponse = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: authData.user.id,
+          email: data.email,
+          name: data.name,
+          userType: data.userType,
+        }),
+      })
+
+      const createUserData = await createUserResponse.json()
+
+      if (!createUserResponse.ok) {
+        console.error('User creation error:', createUserData)
+        setError(`Failed to complete registration: ${createUserData.error}`)
         return
       }
 
