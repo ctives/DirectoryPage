@@ -1,18 +1,70 @@
-import Link from 'next/link'
-import { getServerSession } from 'next-auth'
+'use client'
 
-export default async function Home() {
-  const session = await getServerSession()
+import Link from 'next/link'
+import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+
+export default function Home() {
+  const { data: session } = useSession()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [filters, setFilters] = useState({
+    serviceType: 'both',
+    neighborhood: '',
+    zipCode: '',
+  })
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    // TODO: Implement search functionality
+    console.log('Search:', searchQuery, filters)
+  }
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFilters(prev => ({ ...prev, [name]: value }))
+  }
+
+  // Mock business data - will be replaced with actual data from API
+  const mockBusinesses = [
+    {
+      id: '1',
+      name: 'Sparkle Clean Services',
+      rating: 4.8,
+      reviewCount: 145,
+      serviceType: 'residential',
+      neighborhoods: ['Downtown', 'East Nashville'],
+      description: 'Professional residential cleaning with 10+ years experience',
+    },
+    {
+      id: '2',
+      name: 'Nashville Office Cleaners',
+      rating: 4.9,
+      reviewCount: 89,
+      serviceType: 'commercial',
+      neighborhoods: ['Business District'],
+      description: 'Commercial office and janitorial services',
+    },
+    {
+      id: '3',
+      name: 'Premier Home Clean',
+      rating: 4.7,
+      reviewCount: 203,
+      serviceType: 'both',
+      neighborhoods: ['West Nashville', 'Sylvan Park'],
+      description: 'Full-service cleaning for homes and light commercial',
+    },
+  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-neutral-50">
+    <div className="min-h-screen bg-neutral-50">
       {/* Navigation */}
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-primary-700">
+            <Link href="/" className="text-2xl font-bold text-primary-700 hover:text-primary-800">
               Nashville Cleaning Directory
-            </h1>
+            </Link>
             <div className="flex gap-4 items-center">
               {session ? (
                 <>
@@ -50,111 +102,185 @@ export default async function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-neutral-900 mb-6">
-            Find Trusted Cleaning Services in Nashville
+      {/* Search Section */}
+      <section className="bg-gradient-to-b from-primary-50 to-neutral-50 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-bold text-neutral-900 mb-2 text-center">
+            Find Cleaning Services in Nashville
+          </h1>
+          <p className="text-lg text-neutral-600 text-center mb-8">
+            Search by business name, zip code, or Nashville neighborhood
+          </p>
+
+          {/* Search Form */}
+          <form onSubmit={handleSearch} className="space-y-4">
+            {/* Main Search Bar */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Search by name, zip code, or neighborhood..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <button
+                type="submit"
+                className="bg-accent-500 hover:bg-accent-600 text-white font-medium px-8 py-3 rounded-lg transition"
+              >
+                Search
+              </button>
+            </div>
+
+            {/* Advanced Search Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+            >
+              {showAdvanced ? '− Hide' : '+ Show'} Advanced Search
+            </button>
+
+            {/* Advanced Search Filters */}
+            {showAdvanced && (
+              <div className="bg-white rounded-lg p-6 border border-neutral-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Service Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Service Type
+                    </label>
+                    <select
+                      name="serviceType"
+                      value={filters.serviceType}
+                      onChange={handleFilterChange}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="both">All Services</option>
+                      <option value="residential">Residential</option>
+                      <option value="commercial">Commercial</option>
+                    </select>
+                  </div>
+
+                  {/* Neighborhood */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Neighborhood
+                    </label>
+                    <select
+                      name="neighborhood"
+                      value={filters.neighborhood}
+                      onChange={handleFilterChange}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">All Neighborhoods</option>
+                      <option value="downtown">Downtown</option>
+                      <option value="east-nashville">East Nashville</option>
+                      <option value="west-nashville">West Nashville</option>
+                      <option value="sylvan-park">Sylvan Park</option>
+                      <option value="business-district">Business District</option>
+                    </select>
+                  </div>
+
+                  {/* Zip Code */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Zip Code
+                    </label>
+                    <input
+                      type="text"
+                      name="zipCode"
+                      placeholder="37201"
+                      value={filters.zipCode}
+                      onChange={handleFilterChange}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </form>
+        </div>
+      </section>
+
+      {/* Results Section */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-neutral-900">
+            Cleaning Services {searchQuery && `for "${searchQuery}"`}
           </h2>
-          <p className="text-xl text-neutral-600 mb-8 max-w-2xl mx-auto">
-            Connect with vetted cleaning professionals for your residential or commercial needs. Get instant quotes and reviews from real customers.
-          </p>
-          <div className="flex gap-4 justify-center flex-col sm:flex-row">
+          <p className="text-neutral-600">{mockBusinesses.length} results</p>
+        </div>
+
+        {/* Business Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {mockBusinesses.map((business) => (
             <Link
-              href="/auth/signup?type=customer"
-              className="bg-accent-500 hover:bg-accent-600 text-white font-bold py-4 px-8 rounded-lg transition text-lg"
+              key={business.id}
+              href={`/business/${business.id}`}
+              className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
             >
-              Find Services
+              <div className="p-6">
+                {/* Business Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-neutral-900 mb-1">
+                      {business.name}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-yellow-500">★</span>
+                      <span className="font-medium text-neutral-800">
+                        {business.rating}
+                      </span>
+                      <span className="text-neutral-600 text-sm">
+                        ({business.reviewCount} reviews)
+                      </span>
+                    </div>
+                  </div>
+                  <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full">
+                    {business.serviceType === 'both'
+                      ? 'Residential & Commercial'
+                      : business.serviceType === 'residential'
+                      ? 'Residential'
+                      : 'Commercial'}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <p className="text-neutral-600 text-sm mb-4">
+                  {business.description}
+                </p>
+
+                {/* Neighborhoods */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {business.neighborhoods.map((neighborhood) => (
+                    <span
+                      key={neighborhood}
+                      className="bg-neutral-100 text-neutral-700 text-xs px-2 py-1 rounded"
+                    >
+                      {neighborhood}
+                    </span>
+                  ))}
+                </div>
+
+                {/* CTA Button */}
+                <button className="w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 rounded-lg transition">
+                  Get Quote
+                </button>
+              </div>
             </Link>
-            <Link
-              href="/auth/signup?type=business"
-              className="bg-primary-500 hover:bg-primary-600 text-white font-bold py-4 px-8 rounded-lg transition text-lg"
-            >
-              List Your Business
-            </Link>
-          </div>
+          ))}
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-4xl font-bold text-primary-600 mb-2">500+</div>
-            <p className="text-neutral-600">Verified Businesses</p>
+        {/* Empty State */}
+        {mockBusinesses.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-neutral-600 text-lg">No businesses found. Try adjusting your search.</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-4xl font-bold text-primary-600 mb-2">2,000+</div>
-            <p className="text-neutral-600">Happy Customers</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-4xl font-bold text-primary-600 mb-2">4.8★</div>
-            <p className="text-neutral-600">Average Rating</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-3xl font-bold text-center text-neutral-900 mb-12">
-            Why Choose Nashville Cleaning Directory?
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-primary-50 rounded-lg p-8">
-              <h4 className="text-xl font-bold text-primary-900 mb-3">
-                ✓ Verified Professionals
-              </h4>
-              <p className="text-primary-700">
-                Every business is verified and insured. Background checks and insurance verification for your peace of mind.
-              </p>
-            </div>
-            <div className="bg-primary-50 rounded-lg p-8">
-              <h4 className="text-xl font-bold text-primary-900 mb-3">
-                ✓ Real Customer Reviews
-              </h4>
-              <p className="text-primary-700">
-                See honest reviews from verified customers. No spam or fake ratings. True community feedback.
-              </p>
-            </div>
-            <div className="bg-primary-50 rounded-lg p-8">
-              <h4 className="text-xl font-bold text-primary-900 mb-3">
-                ✓ Instant Quotes
-              </h4>
-              <p className="text-primary-700">
-                Get multiple quotes from competitors. Compare prices and services easily. Free quote requests.
-              </p>
-            </div>
-            <div className="bg-primary-50 rounded-lg p-8">
-              <h4 className="text-xl font-bold text-primary-900 mb-3">
-                ✓ Local Expertise
-              </h4>
-              <p className="text-primary-700">
-                Focused on Nashville and surrounding areas. Local knowledge means better service recommendations.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-primary-600 text-white py-16">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h3 className="text-3xl font-bold mb-4">
-            Ready to find your perfect cleaning service?
-          </h3>
-          <p className="text-lg mb-8 text-primary-100">
-            Join thousands of Nashville residents getting professional cleaning services
-          </p>
-          <Link
-            href="/auth/signup"
-            className="inline-block bg-accent-500 hover:bg-accent-600 text-white font-bold py-3 px-8 rounded-lg transition text-lg"
-          >
-            Get Started Now
-          </Link>
-        </div>
+        )}
       </section>
 
       {/* Footer */}
-      <footer className="bg-neutral-900 text-neutral-400 py-12">
+      <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p>&copy; 2024 Nashville Cleaning Directory. All rights reserved.</p>
         </div>
