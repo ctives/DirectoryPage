@@ -11,7 +11,10 @@ This platform serves two primary audiences:
 
 ## Documentation
 
-- [Marketing Plan](MARKETING_PLAN.md) - Comprehensive marketing strategy for launching and growing the directory
+- [Marketing Plan](/docs/MARKETING_PLAN.md) - Comprehensive marketing strategy for launching and growing the directory
+- [Tech Stack Decisions](./docs/TECH_STACK.md)
+- [Database Schema](./docs/DATABASE_SCHEMA.md)
+- [Brainstorm Sessions](./docs/BRAINSTROM.md)
 
 ## Value Proposition
 
