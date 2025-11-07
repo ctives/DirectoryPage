@@ -14,6 +14,7 @@ This platform serves two primary audiences:
 - [Marketing Plan](/docs/MARKETING_PLAN.md) - Comprehensive marketing strategy for launching and growing the directory
 - [Tech Stack Decisions](./docs/TECH_STACK.md)
 - [Authentication Strategy](./docs/AUTHENTICATION.md) - Complete auth implementation guide for 3 user types
+- [Admin Dashboard](./docs/ADMIN_DASHBOARD.md) - Admin panel design, layout, and features
 - [Color Palette](./docs/COLOR_PALETTE.md) - Design system and color usage guide
 - [Database Schema](./docs/DATABASE_SCHEMA.md)
 - [Brainstorm Sessions](./docs/BRAINSTORM.md)
