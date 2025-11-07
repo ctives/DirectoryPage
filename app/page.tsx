@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 
 export default function Home() {
@@ -14,9 +14,36 @@ export default function Home() {
     zipCode: '',
   })
   const [searchResults, setSearchResults] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [hasSearched, setHasSearched] = useState(false)
+  const [hasSearched, setHasSearched] = useState(true)
+
+  // Load all businesses on component mount
+  useEffect(() => {
+    const loadInitialBusinesses = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        const response = await fetch('/api/search')
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to load businesses')
+        }
+
+        setSearchResults(result.data || [])
+        setHasSearched(true)
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred'
+        setError(errorMessage)
+        console.error('Error loading businesses:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadInitialBusinesses()
+  }, [])
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
