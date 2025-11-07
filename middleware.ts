@@ -48,7 +48,13 @@ export default withAuth(
         // Check if path requires authentication
         const pathname = req.nextUrl.pathname
 
+        // Allow public routes
         if (publicRoutes.includes(pathname)) {
+          return true
+        }
+
+        // Allow public API routes (search)
+        if (pathname.startsWith('/api/search')) {
           return true
         }
 

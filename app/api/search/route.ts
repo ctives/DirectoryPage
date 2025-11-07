@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 interface Business {
@@ -20,12 +20,16 @@ export async function GET(request: NextRequest) {
     const neighborhood = searchParams.get('neighborhood') || ''
     const zipCode = searchParams.get('zipCode') || ''
 
-    const supabase = await createClient()
+    // Use public anon key for read-only access to public data
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
 
     // Build the query
     let sqlQuery = supabase
       .from('businesses')
-      .select('id, name, description, average_rating as rating, review_count, service_type, zip_code, address')
+      .select('id, name, description, average_rating, review_count, service_type, zip_code, address')
       .eq('status', 'active')
 
     // Filter by service type

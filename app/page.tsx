@@ -249,7 +249,7 @@ export default function Home() {
                             <div className="flex items-center gap-2">
                               <span className="text-yellow-500">★</span>
                               <span className="font-medium text-neutral-800">
-                                {business.rating || 'N/A'}
+                                {business.average_rating || 'N/A'}
                               </span>
                               <span className="text-neutral-600 text-sm">
                                 ({business.review_count || 0} reviews)
