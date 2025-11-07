@@ -13,11 +13,43 @@ export default function Home() {
     neighborhood: '',
     zipCode: '',
   })
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [hasSearched, setHasSearched] = useState(false)
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement search functionality
-    console.log('Search:', searchQuery, filters)
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const params = new URLSearchParams()
+      if (searchQuery) params.append('query', searchQuery)
+      if (filters.serviceType && filters.serviceType !== 'both') {
+        params.append('serviceType', filters.serviceType)
+      }
+      if (filters.neighborhood) params.append('neighborhood', filters.neighborhood)
+      if (filters.zipCode) params.append('zipCode', filters.zipCode)
+
+      const response = await fetch(`/api/search?${params.toString()}`)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Search failed')
+      }
+
+      setSearchResults(result.data || [])
+      setHasSearched(true)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
+      setError(errorMessage)
+      setSearchResults([])
+      setHasSearched(true)
+      console.error('Search error:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
@@ -25,36 +57,8 @@ export default function Home() {
     setFilters(prev => ({ ...prev, [name]: value }))
   }
 
-  // Mock business data - will be replaced with actual data from API
-  const mockBusinesses = [
-    {
-      id: '1',
-      name: 'Sparkle Clean Services',
-      rating: 4.8,
-      reviewCount: 145,
-      serviceType: 'residential',
-      neighborhoods: ['Downtown', 'East Nashville'],
-      description: 'Professional residential cleaning with 10+ years experience',
-    },
-    {
-      id: '2',
-      name: 'Nashville Office Cleaners',
-      rating: 4.9,
-      reviewCount: 89,
-      serviceType: 'commercial',
-      neighborhoods: ['Business District'],
-      description: 'Commercial office and janitorial services',
-    },
-    {
-      id: '3',
-      name: 'Premier Home Clean',
-      rating: 4.7,
-      reviewCount: 203,
-      serviceType: 'both',
-      neighborhoods: ['West Nashville', 'Sylvan Park'],
-      description: 'Full-service cleaning for homes and light commercial',
-    },
-  ]
+  // Display businesses based on search results or show empty state
+  const businessesToDisplay = hasSearched ? searchResults : []
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -203,81 +207,96 @@ export default function Home() {
       </section>
 
       {/* Results Section */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-neutral-900">
-            Cleaning Services {searchQuery && `for "${searchQuery}"`}
-          </h2>
-          <p className="text-neutral-600">{mockBusinesses.length} results</p>
-        </div>
+      {hasSearched && (
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {error && (
+            <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800">Error: {error}</p>
+            </div>
+          )}
 
-        {/* Business Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockBusinesses.map((business) => (
-            <Link
-              key={business.id}
-              href={`/business/${business.id}`}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
-            >
-              <div className="p-6">
-                {/* Business Header */}
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-neutral-900 mb-1">
-                      {business.name}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-yellow-500">★</span>
-                      <span className="font-medium text-neutral-800">
-                        {business.rating}
-                      </span>
-                      <span className="text-neutral-600 text-sm">
-                        ({business.reviewCount} reviews)
-                      </span>
-                    </div>
-                  </div>
-                  <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full">
-                    {business.serviceType === 'both'
-                      ? 'Residential & Commercial'
-                      : business.serviceType === 'residential'
-                      ? 'Residential'
-                      : 'Commercial'}
-                  </span>
-                </div>
+          {isLoading && (
+            <div className="text-center py-12">
+              <p className="text-neutral-600">Loading results...</p>
+            </div>
+          )}
 
-                {/* Description */}
-                <p className="text-neutral-600 text-sm mb-4">
-                  {business.description}
-                </p>
+          {!isLoading && !error && (
+            <>
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-bold text-neutral-900">
+                  Cleaning Services {searchQuery && `for "${searchQuery}"`}
+                </h2>
+                <p className="text-neutral-600">{businessesToDisplay.length} results</p>
+              </div>
 
-                {/* Neighborhoods */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {business.neighborhoods.map((neighborhood) => (
-                    <span
-                      key={neighborhood}
-                      className="bg-neutral-100 text-neutral-700 text-xs px-2 py-1 rounded"
+              {/* Business Cards Grid */}
+              {businessesToDisplay.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {businessesToDisplay.map((business: any) => (
+                    <Link
+                      key={business.id}
+                      href={`/business/${business.id}`}
+                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
                     >
-                      {neighborhood}
-                    </span>
+                      <div className="p-6">
+                        {/* Business Header */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-lg font-bold text-neutral-900 mb-1">
+                              {business.name}
+                            </h3>
+                            <div className="flex items-center gap-2">
+                              <span className="text-yellow-500">★</span>
+                              <span className="font-medium text-neutral-800">
+                                {business.rating || 'N/A'}
+                              </span>
+                              <span className="text-neutral-600 text-sm">
+                                ({business.review_count || 0} reviews)
+                              </span>
+                            </div>
+                          </div>
+                          <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            {business.service_type === 'both'
+                              ? 'Residential & Commercial'
+                              : business.service_type === 'residential'
+                              ? 'Residential'
+                              : 'Commercial'}
+                          </span>
+                        </div>
+
+                        {/* Description */}
+                        {business.description && (
+                          <p className="text-neutral-600 text-sm mb-4">
+                            {business.description}
+                          </p>
+                        )}
+
+                        {/* Location Info */}
+                        {business.address && (
+                          <p className="text-neutral-500 text-xs mb-4">
+                            {business.address}
+                            {business.zip_code && ` • ${business.zip_code}`}
+                          </p>
+                        )}
+
+                        {/* CTA Button */}
+                        <button className="w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 rounded-lg transition">
+                          Get Quote
+                        </button>
+                      </div>
+                    </Link>
                   ))}
                 </div>
-
-                {/* CTA Button */}
-                <button className="w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 rounded-lg transition">
-                  Get Quote
-                </button>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {mockBusinesses.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-neutral-600 text-lg">No businesses found. Try adjusting your search.</p>
-          </div>
-        )}
-      </section>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-neutral-600 text-lg">No businesses found. Try adjusting your search.</p>
+                </div>
+              )}
+            </>
+          )}
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">
