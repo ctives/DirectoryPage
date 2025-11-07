@@ -13,7 +13,7 @@ export default async function Home() {
             <h1 className="text-2xl font-bold text-primary-700">
               Nashville Cleaning Directory
             </h1>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               {session ? (
                 <>
                   <Link
