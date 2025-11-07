@@ -41,6 +41,16 @@ When building this application, review all files in `/docs` first.
 
 ## Getting Started
 
+### Setup Instructions
+
+See [Setup Guide](./docs/SETUP.md) to:
+- Configure environment variables
+- Set up Supabase database
+- Generate NextAuth secrets
+- Run the development server
+
+### Development Strategy
+
 See the [Marketing Plan](./docs/MARKETING_PLAN.md) for detailed strategies on:
 - Reaching Nashville residents
 - Recruiting cleaning businesses
