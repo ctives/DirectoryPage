@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { SignUpSchema } from '@/lib/validations/auth'
@@ -22,12 +22,18 @@ export default function SignUpPage() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<SignUpInput>({
     resolver: zodResolver(SignUpSchema),
-    defaultValues: {
-      userType: userType || undefined,
-    },
+    mode: 'onBlur',
   })
+
+  // Set userType when it changes
+  useEffect(() => {
+    if (userType) {
+      setValue('userType', userType)
+    }
+  }, [userType, setValue])
 
   async function onSubmit(data: SignUpInput) {
     setIsLoading(true)

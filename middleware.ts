@@ -12,7 +12,7 @@ const protectedRoutes = [
 ]
 
 // Public routes (no auth required)
-const publicRoutes = ['/auth/login', '/auth/signup', '/auth/error', '/']
+const publicRoutes = ['/auth/login', '/auth/signup', '/auth/error', '/', '/terms', '/privacy', '/auth/verify-email']
 
 export default withAuth(
   function middleware(request: NextRequest) {
