@@ -42,6 +42,18 @@ export async function GET(request: NextRequest) {
       sqlQuery = sqlQuery.eq('zip_code', zipCode)
     }
 
+    // Filter by search query (name, description, or zip code)
+    if (query) {
+      // Check if query looks like a zip code (all digits)
+      if (/^\d+$/.test(query)) {
+        // Search by name, description, OR zip code
+        sqlQuery = sqlQuery.or(`name.ilike.%${query}%,description.ilike.%${query}%,zip_code.eq.${query}`)
+      } else {
+        // Regular text search on name and description
+        sqlQuery = sqlQuery.or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+      }
+    }
+
     // Filter by neighborhood (using service_areas table join)
     if (neighborhood) {
       // We'll need to search in service_areas table for the neighborhood
@@ -57,11 +69,6 @@ export async function GET(request: NextRequest) {
         // No businesses found for this neighborhood
         return NextResponse.json({ data: [], count: 0 })
       }
-    }
-
-    // Filter by search query (name or description)
-    if (query) {
-      sqlQuery = sqlQuery.or(`name.ilike.%${query}%,description.ilike.%${query}%`)
     }
 
     const { data, error, count } = await sqlQuery
