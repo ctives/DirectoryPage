@@ -13,8 +13,12 @@ This platform serves two primary audiences:
 
 - [Marketing Plan](/docs/MARKETING_PLAN.md) - Comprehensive marketing strategy for launching and growing the directory
 - [Tech Stack Decisions](./docs/TECH_STACK.md)
+- [Authentication Strategy](./docs/AUTHENTICATION.md) - Complete auth implementation guide for 3 user types
 - [Database Schema](./docs/DATABASE_SCHEMA.md)
-- [Brainstorm Sessions](./docs/BRAINSTROM.md)
+- [Brainstorm Sessions](./docs/BRAINSTORM.md)
+
+## For AI Development
+When building this application, review all files in `/docs` first.
 
 ## Value Proposition
 
@@ -37,7 +41,7 @@ This platform serves two primary audiences:
 
 ## Getting Started
 
-See the [Marketing Plan](MARKETING_PLAN.md) for detailed strategies on:
+See the [Marketing Plan](./docs/MARKETING_PLAN.md) for detailed strategies on:
 - Reaching Nashville residents
 - Recruiting cleaning businesses
 - Launch timeline and budget

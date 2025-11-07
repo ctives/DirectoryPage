@@ -230,7 +230,7 @@ When needed: $25/month for 8GB DB + 100GB storage
 
  
 
-### Supabase Auth
+### Supabase Auth with NextAuth.js Middleware
 
 **Why:**
 
@@ -242,15 +242,63 @@ When needed: $25/month for 8GB DB + 100GB storage
 
 - ✅ Row Level Security integration
 
- 
+- ✅ NextAuth.js for middleware protection and role-based access control
+
+
+
+**Hybrid Authentication Strategy (Option C)**
+
+Three user types with different access levels:
+
+| User Type | Sign-up Method | Access Level | Features |
+|-----------|---|---|---|
+| **Admin** | Manual (you only) | Full platform | Approve businesses, moderate reviews, analytics, user management |
+| **Business Owner** | Self-service + verification | Their listing(s) | Edit profile, view analytics, respond to reviews, manage premium |
+| **Customer** | Optional email/Google | Public + dashboard | Browse, quote requests, reviews, favorites |
+
+**Phase 1 (MVP - Week 1-2):**
+- Email/password authentication
+- Simple role assignment in database
+- Basic access control
+- Manual business approval workflow
+
+**Phase 2 (Week 2-3):**
+- Add Google OAuth (highest conversion rate)
+- One-click sign up for customers
+- Business phone verification (Twilio)
+
+**Phase 3 (Post-MVP):**
+- Magic links (passwordless email)
+- Two-factor authentication (admin only)
+- Facebook OAuth (if data shows demand)
+
+**Route Protection with Middleware:**
+- Public routes: `/`, `/search`, `/business/[slug]`, `/neighborhoods/*`
+- Customer routes: `/dashboard/*` (auth required)
+- Business routes: `/business/dashboard/*` (auth + business role)
+- Admin routes: `/admin/*` (auth + admin role)
+
+**Business Verification:**
+1. MVP: Manual approval (upload license/insurance document)
+2. Phase 2: Phone verification via Twilio
+3. Email domain verification: Validate business email domain
+
+**Review Authenticity:**
+- Only verified customers can review
+- Verification methods:
+  - Quote submitted through platform (strongest)
+  - Receipt/invoice photo upload (manual approval)
+  - Email verification (minimum)
 
 **Auth Methods:**
 
 - Email/password (primary)
 
-- Magic links (passwordless)
+- Google OAuth (Phase 2: highest conversion)
 
-- Google OAuth (future: for customer reviews)
+- Magic links/passwordless (Phase 3)
+
+- Two-factor authentication for admin (Phase 3)
 
  
 

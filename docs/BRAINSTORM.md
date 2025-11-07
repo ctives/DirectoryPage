@@ -320,7 +320,183 @@ Areas: East Nashville, Germantown
 
 ---
 
- 
+
+
+## 🔐 Authentication & User Management
+
+### Three User Types
+
+**1. Admin (Platform Owner)**
+- Full control over platform
+- Manually created account in Supabase (you only)
+- Role: `admin`
+- Access: All admin routes (`/admin/*`)
+- Responsibilities: Approve businesses, moderate reviews, manage users, view platform analytics
+
+**2. Business Owners**
+- Manage their cleaning service listing(s)
+- Self-service registration with verification required
+- Role: `business`
+- Access: Their business dashboard only (`/business/dashboard/*`)
+- Can: Edit profile, upload photos, respond to reviews, view analytics, manage premium subscription
+
+**3. Customers**
+- Browse and engage with cleaning services
+- Optional account creation (browse without login)
+- Role: `customer`
+- Access: Public browse + personal dashboard if account created (`/dashboard/*`)
+- Can: Request quotes, write reviews, save favorites, track quote history
+
+### Hybrid Authentication Strategy (Option C)
+
+**Multiple Sign-In Methods:**
+- Email/Password (MVP - Phase 1)
+- Google OAuth (Phase 2 - highest conversion)
+- Magic Links/Passwordless (Phase 3)
+- Two-Factor Authentication for admin (Phase 3)
+
+**User Flows:**
+
+*Admin User:*
+```
+1. Manually create account in Supabase dashboard
+2. Set role = 'admin' in users table
+3. Login with email/password at /admin/login
+4. Access admin panel with full platform access
+5. Receives notifications for new businesses, reviews, user reports
+```
+
+*Business Owner - Create New Listing:*
+```
+1. Click "List Your Business" from homepage
+2. Sign up with email/password or Google
+3. Fill business profile form:
+   - Business name, phone, email, website
+   - Service categories (residential, commercial, etc.)
+   - Service areas (Nashville neighborhoods, zip codes)
+   - Years in business
+   - Upload 3-5 professional photos
+   - Business description (150-500 words)
+4. Upload verification documents:
+   - Business license (required)
+   - Insurance certificate (required)
+   - Background check (optional)
+5. Status: "Pending Approval"
+6. Admin reviews application (email notification)
+7. Admin approves or requests changes
+8. Upon approval:
+   - Business goes LIVE on directory
+   - Business owner notified via email
+   - Can now manage listing and access dashboard
+9. Receives 60 days FREE Premium (soft launch incentive)
+```
+
+*Business Owner - Claim Existing Listing:*
+```
+1. Customer finds their business in directory (public search)
+2. Click "Claim This Business" button
+3. Sign up or login with email/password or Google
+4. Verify ownership using one of:
+   a) Upload business documents (license, insurance)
+   b) Phone verification: Call business number, enter code
+   c) Email verification: Email to business domain
+5. Admin reviews claim request
+6. Upon approval:
+   - Business owner gains dashboard access
+   - Can edit listing details
+   - Can respond to existing reviews
+   - Receives 60 days FREE Premium
+```
+
+*Customer - Browse Without Account:*
+```
+1. Visit Nashville Cleaning Directory homepage
+2. Search for cleaning services:
+   - By service type (residential, commercial, deep clean, etc.)
+   - By location (zip code, neighborhood, radius)
+   - By availability (this week, weekends, etc.)
+   - By trust indicators (insured, 4+ stars, etc.)
+3. View business profiles (photos, description, hours, contact)
+4. Click "Request Quote" → Simple form (no login required):
+   - Name, email, phone
+   - Property address
+   - Service details
+   - Message
+5. Submit quote request
+6. Quote routed to matching businesses
+7. Businesses contact customer directly
+```
+
+*Customer - Create Account:*
+```
+1. Click "Request Quote" or "Write Review"
+2. Prompted to sign up (email/password or Google)
+3. Create account and fill profile
+4. Account unlocks features:
+   - Quote request history (view all submitted requests)
+   - Favorite businesses (bookmark and manage)
+   - Email notifications (new services, offers in your area)
+   - Review submissions (with verification)
+5. When leaving review:
+   - Must have previously submitted quote to that business, OR
+   - Upload receipt/invoice photo for verification
+   - Admin approves review to prevent spam
+```
+
+### Trust & Security
+
+**Business Verification (CRITICAL - Prevents Fraud):**
+
+*MVP Approach (Manual Approval):*
+- Business uploads:
+  - Business license (required)
+  - Insurance/bonding certificate (required)
+  - Background check document (optional)
+- Admin reviews documents within 24-48 hours
+- Admin approves or requests additional info
+- Business marked "Verified" when approved
+
+*Phase 2 Enhancements:*
+- Phone verification (Twilio): Call business number, enter verification code
+- Instant verification without manual review
+- Reduces approval time from days to minutes
+- More scalable as business grows
+
+*Email Domain Verification:*
+- Validate business email domain matches website
+- Prevents someone claiming with personal Gmail
+- Automated verification process
+
+**Why This Matters:**
+- Customers trust they're calling real businesses
+- Prevents fake competitors claiming legitimate businesses
+- Maintains platform credibility vs. Yelp/Thumbtack
+
+**Review Verification (CRITICAL - Prevents Fake Reviews):**
+
+Customers can only review if:
+1. **They submitted a quote request** through platform (strongest)
+   - System tracks quote requests
+   - Only customers with quote requests can review that business
+
+2. **OR they upload receipt/invoice:**
+   - Upload photo of receipt/invoice showing date
+   - Admin manually verifies
+   - Approved reviews published
+
+3. **Minimum: Email verification**
+   - Verify email address
+   - Prevents bot reviews
+
+**Why This Matters:**
+- 92% of consumers trust online reviews
+- Fake reviews destroy trust and conversion
+- This differentiates us from competitors
+- Customers feel confident relying on reviews
+
+---
+
+
 
 ## 🔎 Search & Filter System
 
