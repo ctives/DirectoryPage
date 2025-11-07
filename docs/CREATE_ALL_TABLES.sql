@@ -359,6 +359,12 @@ CREATE POLICY "Users can update their own data" ON users
   USING (auth.uid() = id)
   WITH CHECK (auth.uid() = id);
 
+-- Users: Insert (create new account during signup)
+DROP POLICY IF EXISTS "Users can create their own account" ON users;
+CREATE POLICY "Users can create their own account" ON users
+  FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
 -- Businesses: Read active businesses
 DROP POLICY IF EXISTS "Anyone can read active businesses" ON businesses;
 CREATE POLICY "Anyone can read active businesses" ON businesses
