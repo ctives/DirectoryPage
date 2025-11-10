@@ -1,91 +1,37 @@
-'use client'
-
+import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import ClientSearchComponent from '@/components/ClientSearchComponent'
+
+// Hero images with unique alt text for each
+const HERO_IMAGES = [
+  {
+    src: '/images/hero/kitchen-cleaning.jpg',
+    alt: 'Professional kitchen cleaning service showing sparkling countertops and appliances',
+  },
+  {
+    src: '/images/hero/bathroom-cleaning.jpg',
+    alt: 'Deep bathroom cleaning and sanitization service',
+  },
+  {
+    src: '/images/hero/living-room-cleaning.jpg',
+    alt: 'Residential living room cleaning and organization',
+  },
+  {
+    src: '/images/hero/office-cleaning.jpg',
+    alt: 'Professional commercial office space cleaning',
+  },
+  {
+    src: '/images/hero/window-cleaning.jpg',
+    alt: 'Window and glass cleaning with professional results',
+  },
+] as const
+
+// Revalidate page every 5 minutes to rotate hero images
+export const revalidate = 300
 
 export default function Home() {
-  const { data: session } = useSession()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showAdvanced, setShowAdvanced] = useState(false)
-  const [filters, setFilters] = useState({
-    serviceType: 'both',
-    neighborhood: '',
-    zipCode: '',
-  })
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [hasSearched, setHasSearched] = useState(true)
-
-  // Load all businesses on component mount
-  useEffect(() => {
-    const loadInitialBusinesses = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
-        const response = await fetch('/api/search')
-        const result = await response.json()
-
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to load businesses')
-        }
-
-        setSearchResults(result.data || [])
-        setHasSearched(true)
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred'
-        setError(errorMessage)
-        console.error('Error loading businesses:', err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadInitialBusinesses()
-  }, [])
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const params = new URLSearchParams()
-      if (searchQuery) params.append('query', searchQuery)
-      if (filters.serviceType && filters.serviceType !== 'both') {
-        params.append('serviceType', filters.serviceType)
-      }
-      if (filters.neighborhood) params.append('neighborhood', filters.neighborhood)
-      if (filters.zipCode) params.append('zipCode', filters.zipCode)
-
-      const response = await fetch(`/api/search?${params.toString()}`)
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Search failed')
-      }
-
-      setSearchResults(result.data || [])
-      setHasSearched(true)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
-      setError(errorMessage)
-      setSearchResults([])
-      setHasSearched(true)
-      console.error('Search error:', err)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFilters(prev => ({ ...prev, [name]: value }))
-  }
-
-  // Display businesses based on search results or show empty state
-  const businessesToDisplay = hasSearched ? searchResults : []
+  // Server-side random image selection
+  const selectedImage = HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)]
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -97,233 +43,61 @@ export default function Home() {
               Nashville Cleaning Directory
             </Link>
             <div className="flex gap-4 items-center">
-              {session ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="text-neutral-700 hover:text-primary-600 font-medium"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/auth/signout"
-                    className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-medium transition"
-                  >
-                    Sign Out
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/auth/login"
-                    className="text-neutral-700 hover:text-primary-600 font-medium"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/auth/signup"
-                    className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
+              <Link
+                href="/auth/login"
+                className="text-neutral-700 hover:text-primary-600 font-medium"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition"
+              >
+                Get Started
+              </Link>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Search Section */}
-      <section className="bg-gradient-to-b from-primary-50 to-neutral-50 py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-neutral-900 mb-2 text-center">
-            Find Cleaning Services in Nashville
-          </h1>
-          <p className="text-lg text-neutral-600 text-center mb-8">
-            Search by business name, zip code, or Nashville neighborhood
-          </p>
+      {/* Hero Section with Rotating Background Image */}
+      <section className="relative h-[600px] w-full overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src={selectedImage.src}
+            alt={selectedImage.alt}
+            fill
+            priority
+            sizes="100vw"
+            quality={85}
+            style={{
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }}
+          />
+          {/* Dark gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
+        </div>
 
-          {/* Search Form */}
-          <form onSubmit={handleSearch} className="space-y-4">
-            {/* Main Search Bar */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Search by name, zip code, or neighborhood..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <button
-                type="submit"
-                className="bg-accent-500 hover:bg-accent-600 text-white font-medium px-8 py-3 rounded-lg transition"
-              >
-                Search
-              </button>
-            </div>
+        {/* Hero Content */}
+        <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
+          <div className="w-full max-w-4xl">
+            <h1 className="mb-4 text-center text-5xl font-bold text-white drop-shadow-lg md:text-6xl">
+              Find Trusted Cleaning Services Near You
+            </h1>
+            <p className="mb-8 text-center text-lg text-white/95 drop-shadow font-medium md:text-xl">
+              Connect with local cleaners, read reviews, and book with confidence
+            </p>
 
-            {/* Advanced Search Toggle */}
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-            >
-              {showAdvanced ? '− Hide' : '+ Show'} Advanced Search
-            </button>
-
-            {/* Advanced Search Filters */}
-            {showAdvanced && (
-              <div className="bg-white rounded-lg p-6 border border-neutral-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Service Type */}
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Service Type
-                    </label>
-                    <select
-                      name="serviceType"
-                      value={filters.serviceType}
-                      onChange={handleFilterChange}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="both">All Services</option>
-                      <option value="residential">Residential</option>
-                      <option value="commercial">Commercial</option>
-                    </select>
-                  </div>
-
-                  {/* Neighborhood */}
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Neighborhood
-                    </label>
-                    <select
-                      name="neighborhood"
-                      value={filters.neighborhood}
-                      onChange={handleFilterChange}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="">All Neighborhoods</option>
-                      <option value="downtown">Downtown</option>
-                      <option value="east-nashville">East Nashville</option>
-                      <option value="west-nashville">West Nashville</option>
-                      <option value="sylvan-park">Sylvan Park</option>
-                      <option value="business-district">Business District</option>
-                    </select>
-                  </div>
-
-                  {/* Zip Code */}
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Zip Code
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      placeholder="37201"
-                      value={filters.zipCode}
-                      onChange={handleFilterChange}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </form>
+            {/* Search Form Component */}
+            <ClientSearchComponent />
+          </div>
         </div>
       </section>
 
-      {/* Results Section */}
-      {hasSearched && (
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {error && (
-            <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800">Error: {error}</p>
-            </div>
-          )}
-
-          {isLoading && (
-            <div className="text-center py-12">
-              <p className="text-neutral-600">Loading results...</p>
-            </div>
-          )}
-
-          {!isLoading && !error && (
-            <>
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold text-neutral-900">
-                  Cleaning Services {searchQuery && `for "${searchQuery}"`}
-                </h2>
-                <p className="text-neutral-600">{businessesToDisplay.length} results</p>
-              </div>
-
-              {/* Business Cards Grid */}
-              {businessesToDisplay.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {businessesToDisplay.map((business: any) => (
-                    <Link
-                      key={business.id}
-                      href={`/business/${business.id}`}
-                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
-                    >
-                      <div className="p-6">
-                        {/* Business Header */}
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-lg font-bold text-neutral-900 mb-1">
-                              {business.name}
-                            </h3>
-                            <div className="flex items-center gap-2">
-                              <span className="text-yellow-500">★</span>
-                              <span className="font-medium text-neutral-800">
-                                {business.average_rating || 'N/A'}
-                              </span>
-                              <span className="text-neutral-600 text-sm">
-                                ({business.review_count || 0} reviews)
-                              </span>
-                            </div>
-                          </div>
-                          <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full">
-                            {business.service_type === 'both'
-                              ? 'Residential & Commercial'
-                              : business.service_type === 'residential'
-                              ? 'Residential'
-                              : 'Commercial'}
-                          </span>
-                        </div>
-
-                        {/* Description */}
-                        {business.description && (
-                          <p className="text-neutral-600 text-sm mb-4">
-                            {business.description}
-                          </p>
-                        )}
-
-                        {/* Location Info */}
-                        {business.address && (
-                          <p className="text-neutral-500 text-xs mb-4">
-                            {business.address}
-                            {business.zip_code && ` • ${business.zip_code}`}
-                          </p>
-                        )}
-
-                        {/* CTA Button */}
-                        <button className="w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 rounded-lg transition">
-                          Get Quote
-                        </button>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-neutral-600 text-lg">No businesses found. Try adjusting your search.</p>
-                </div>
-              )}
-            </>
-          )}
-        </section>
-      )}
+      {/* Results Section - Handled by ClientSearchComponent */}
+      <ClientSearchComponent showResults={true} />
 
       {/* Footer */}
       <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">

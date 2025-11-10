@@ -47,8 +47,20 @@ describe('Homepage', () => {
 
       render(<Home />)
 
-      const title = screen.getByText('Find Cleaning Services in Nashville')
+      const title = screen.getByText('Find Trusted Cleaning Services Near You')
       expect(title).toBeInTheDocument()
+    })
+
+    it('should render the hero subtitle', () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: [], count: 0 })
+      })
+
+      render(<Home />)
+
+      const subtitle = screen.getByText('Connect with local cleaners, read reviews, and book with confidence')
+      expect(subtitle).toBeInTheDocument()
     })
 
     it('should render the search form', () => {
@@ -61,19 +73,6 @@ describe('Homepage', () => {
 
       const searchButton = screen.getByRole('button', { name: 'Search' })
       expect(searchButton).toBeInTheDocument()
-    })
-
-    it('should load businesses on component mount', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ data: [], count: 0 })
-      })
-
-      render(<Home />)
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith('/api/search')
-      })
     })
   })
 
@@ -121,8 +120,8 @@ describe('Homepage', () => {
     })
   })
 
-  describe('Business display', () => {
-    it('should display empty state when no results found', async () => {
+  describe('Navigation', () => {
+    it('should render navigation bar with brand name', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ data: [], count: 0 })
@@ -130,36 +129,7 @@ describe('Homepage', () => {
 
       render(<Home />)
 
-      await waitFor(() => {
-        expect(screen.getByText(/No businesses found/)).toBeInTheDocument()
-      })
-    })
-
-    it('should display business names when data loads', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          data: [
-            {
-              id: '1',
-              name: 'Sparkle Clean',
-              description: 'Professional cleaning',
-              average_rating: 4.5,
-              review_count: 20,
-              service_type: 'residential',
-              zip_code: '37201',
-              address: '123 Main St'
-            }
-          ],
-          count: 1
-        })
-      })
-
-      render(<Home />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Sparkle Clean')).toBeInTheDocument()
-      })
+      expect(screen.getByText('Nashville Cleaning Directory')).toBeInTheDocument()
     })
   })
 })
