@@ -2,14 +2,12 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
 
 interface ClientSearchComponentProps {
   showResults?: boolean
 }
 
 export default function ClientSearchComponent({ showResults = false }: ClientSearchComponentProps) {
-  const { data: session } = useSession()
   const [searchQuery, setSearchQuery] = useState('')
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [filters, setFilters] = useState({

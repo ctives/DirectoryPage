@@ -1,17 +1,6 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-interface Business {
-  id: string
-  name: string
-  description: string | null
-  rating: number
-  review_count: number
-  service_type: string
-  zip_code: string | null
-  address: string | null
-}
-
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
