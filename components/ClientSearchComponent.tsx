@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import SearchResultsContainer from './SearchResultsContainer'
 
 interface ClientSearchComponentProps {
   showResults?: boolean
@@ -85,9 +85,6 @@ export default function ClientSearchComponent({ showResults = false }: ClientSea
     const { name, value } = e.target
     setFilters(prev => ({ ...prev, [name]: value }))
   }
-
-  // Display businesses based on search results or show empty state
-  const businessesToDisplay = hasSearched ? searchResults : []
 
   // Only show search form for hero section
   if (!showResults) {
@@ -181,95 +178,30 @@ export default function ClientSearchComponent({ showResults = false }: ClientSea
     )
   }
 
-  // Show results section
+  // Show results section with map integration
   return (
     <>
       {hasSearched && (
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {error && (
             <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-800">Error: {error}</p>
             </div>
           )}
 
-          {isLoading && (
-            <div className="text-center py-12">
-              <p className="text-neutral-600">Loading results...</p>
-            </div>
-          )}
-
-          {!isLoading && !error && (
+          {!error && (
             <>
               <div className="flex justify-between items-center mb-8">
                 <h2 className="text-2xl font-bold text-neutral-900">
                   Cleaning Services {searchQuery && `for "${searchQuery}"`}
                 </h2>
-                <p className="text-neutral-600">{businessesToDisplay.length} results</p>
+                <p className="text-neutral-600">{searchResults.length} results</p>
               </div>
 
-              {/* Business Cards Grid */}
-              {businessesToDisplay.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {businessesToDisplay.map((business: any) => (
-                    <Link
-                      key={business.id}
-                      href={`/business/${business.id}`}
-                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
-                    >
-                      <div className="p-6">
-                        {/* Business Header */}
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-lg font-bold text-neutral-900 mb-1">
-                              {business.name}
-                            </h3>
-                            <div className="flex items-center gap-2">
-                              <span className="text-yellow-500">★</span>
-                              <span className="font-medium text-neutral-800">
-                                {business.average_rating || 'N/A'}
-                              </span>
-                              <span className="text-neutral-600 text-sm">
-                                ({business.review_count || 0} reviews)
-                              </span>
-                            </div>
-                          </div>
-                          <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-3 py-1 rounded-full">
-                            {business.service_type === 'both'
-                              ? 'Residential & Commercial'
-                              : business.service_type === 'residential'
-                              ? 'Residential'
-                              : 'Commercial'}
-                          </span>
-                        </div>
-
-                        {/* Description */}
-                        {business.description && (
-                          <p className="text-neutral-600 text-sm mb-4">
-                            {business.description}
-                          </p>
-                        )}
-
-                        {/* Location Info */}
-                        {business.address && (
-                          <p className="text-neutral-500 text-xs mb-4">
-                            {business.address}
-                            {business.zip_code && ` • ${business.zip_code}`}
-                          </p>
-                        )}
-
-                        {/* CTA Button */}
-                        <button className="w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 rounded-lg transition">
-                          Get Quote
-                        </button>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-neutral-600 text-lg">No businesses found. Try adjusting your search.</p>
-                </div>
-              )}
+              <SearchResultsContainer
+                businesses={searchResults}
+                isLoading={isLoading}
+              />
             </>
           )}
         </section>
