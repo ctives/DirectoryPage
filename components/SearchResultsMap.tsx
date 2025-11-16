@@ -44,7 +44,8 @@ function MapController({
   useEffect(() => {
     if (businesses.length === 0 || hasZoomedRef.current) return
 
-    const bounds = businesses.map((b) => [b.latitude, b.longitude] as [number, number])
+    const businessesWithCoords = businesses.filter((b) => b.latitude && b.longitude)
+    const bounds = businessesWithCoords.map((b) => [b.latitude, b.longitude] as [number, number])
     if (bounds.length > 0) {
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
       hasZoomedRef.current = true

@@ -53,6 +53,11 @@ export default function MapMarker({
   onClick,
   onHover,
 }: MapMarkerProps) {
+  // Skip rendering if coordinates are missing
+  if (!business.latitude || !business.longitude) {
+    return null
+  }
+
   const icon = getMarkerIcon(business.service_type, isActive || false)
 
   return (
