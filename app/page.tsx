@@ -61,9 +61,9 @@ export default function Home() {
       </nav>
 
       {/* Hero Section with Rotating Background Image */}
-      <section className="relative h-[600px] w-full overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 -z-10">
+      <section className="relative h-[600px] w-full overflow-hidden bg-gray-900">
+        {/* Background Image Container */}
+        <div className="absolute inset-0 z-0">
           <Image
             src={selectedImage.src}
             alt={selectedImage.alt}
@@ -76,12 +76,13 @@ export default function Home() {
               objectPosition: 'center',
             }}
           />
-          {/* Dark gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
         </div>
 
+        {/* Dark gradient overlay for text readability */}
+        <div className="absolute inset-0 z-5 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
+
         {/* Hero Content */}
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
+        <div className="absolute inset-0 z-10 flex h-full flex-col items-center justify-center px-4">
           <div className="w-full max-w-4xl">
             <h1 className="mb-4 text-center text-5xl font-bold text-white drop-shadow-lg md:text-6xl">
               Find Trusted Cleaning Services Near You
