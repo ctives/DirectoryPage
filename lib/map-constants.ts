@@ -10,22 +10,12 @@ export const MAP_CONSTANTS = {
   },
 
   // Default zoom level
-  DEFAULT_ZOOM: 12,
+  DEFAULT_ZOOM: 13,
   MIN_ZOOM: 8,
   MAX_ZOOM: 20,
 
-  // Clustering settings
-  CLUSTER_RADIUS: 50,
-  MAX_ZOOM_BEFORE_UNCLUSTERING: 16,
-
-  // Marker sizes
+  // Marker settings
   MARKER_SIZE: 40,
-  CLUSTER_SIZE_SMALL: 45,
-  CLUSTER_SIZE_MEDIUM: 55,
-  CLUSTER_SIZE_LARGE: 70,
-
-  // Map style URL (free OpenMapTiles)
-  MAP_STYLE_URL: '/map-style.json',
 
   // Results view height
   RESULTS_HEIGHT: {

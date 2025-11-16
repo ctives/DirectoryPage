@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
-import Map from 'react-map-gl/maplibre'
-import { MAP_CONSTANTS } from '@/lib/map-constants'
+import { useRef, useEffect } from 'react'
+import { MapContainer, TileLayer, useMap } from 'react-leaflet'
+import MarkerClusterGroup from 'react-leaflet-markercluster'
 import MapMarker from './MapMarker'
-import ClusterMarker from './ClusterMarker'
-import Supercluster from 'supercluster'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+import 'leaflet-defaulticon-compatibility'
 
 interface Business {
   id: string
@@ -28,38 +30,41 @@ interface SearchResultsMapProps {
   isLoading?: boolean
 }
 
-interface Viewport {
-  latitude: number
-  longitude: number
-  zoom: number
-  bearing?: number
-  pitch?: number
-}
+// Inner component to access map instance
+function MapController({
+  businesses,
+  selectedBusinessId,
+  onBusinessSelect,
+  onBusinessHover,
+}: Omit<SearchResultsMapProps, 'isLoading'>) {
+  const map = useMap()
+  const hasZoomedRef = useRef(false)
 
-interface ClusterData {
-  id: number
-  properties: {
-    cluster: boolean
-    cluster_id: number
-    point_count: number
-    point_count_abbreviated: string
-  }
-  geometry: {
-    type: string
-    coordinates: [number, number]
-  }
-}
+  // Auto-zoom to fit all markers on initial load
+  useEffect(() => {
+    if (businesses.length === 0 || hasZoomedRef.current) return
 
-interface PointData {
-  id: string
-  properties: Business & { cluster: false }
-  geometry: {
-    type: string
-    coordinates: [number, number]
-  }
-}
+    const bounds = businesses.map((b) => [b.latitude, b.longitude] as [number, number])
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
+      hasZoomedRef.current = true
+    }
+  }, [businesses, map])
 
-type ClusterOrPoint = ClusterData | PointData
+  return (
+    <MarkerClusterGroup chunkedLoading>
+      {businesses.map((business) => (
+        <MapMarker
+          key={business.id}
+          business={business}
+          isActive={selectedBusinessId === business.id}
+          onClick={() => onBusinessSelect?.(business.id)}
+          onHover={(id) => onBusinessHover?.(id)}
+        />
+      ))}
+    </MarkerClusterGroup>
+  )
+}
 
 export default function SearchResultsMap({
   businesses,
@@ -68,154 +73,6 @@ export default function SearchResultsMap({
   onBusinessHover,
   isLoading,
 }: SearchResultsMapProps) {
-  const mapRef = useRef<any>(null)
-  const [viewport, setViewport] = useState<Viewport>({
-    latitude: MAP_CONSTANTS.DEFAULT_CENTER.latitude,
-    longitude: MAP_CONSTANTS.DEFAULT_CENTER.longitude,
-    zoom: MAP_CONSTANTS.DEFAULT_ZOOM,
-  })
-  const [clusters, setClusters] = useState<ClusterOrPoint[]>([])
-  const superclusterRef = useRef<Supercluster<Business> | null>(null)
-
-  // Initialize Supercluster with business data
-  useEffect(() => {
-    if (!businesses || businesses.length === 0) {
-      setClusters([])
-      return
-    }
-
-    // Create Supercluster instance
-    const index = new Supercluster<Business>({
-      radius: MAP_CONSTANTS.CLUSTER_RADIUS,
-      maxZoom: MAP_CONSTANTS.MAX_ZOOM_BEFORE_UNCLUSTERING,
-    })
-
-    // Add business points with GeoJSON format
-    const points = businesses.map((business) => ({
-      type: 'Feature' as const,
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [business.longitude, business.latitude] as [number, number],
-      },
-      properties: business,
-    }))
-
-    index.load(points)
-    superclusterRef.current = index
-
-    // Get clusters and points for current viewport
-    updateClusters(index)
-  }, [businesses])
-
-  const updateClusters = useCallback(
-    (index: Supercluster<Business> | null) => {
-      if (!index) return
-
-      const zoom = Math.floor(viewport.zoom)
-      const clustersAndPoints = index.getClusters(
-        [
-          viewport.longitude - 5,
-          viewport.latitude - 5,
-          viewport.longitude + 5,
-          viewport.latitude + 5,
-        ],
-        zoom
-      )
-
-      // Type the clusters and points
-      const typedResults = clustersAndPoints.map((item) => {
-        const props = item.properties as any
-        if (props?.cluster) {
-          return {
-            id: props.cluster_id,
-            properties: {
-              cluster: true,
-              cluster_id: props.cluster_id,
-              point_count: props.point_count,
-              point_count_abbreviated: props.point_count_abbreviated,
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: item.geometry.coordinates,
-            },
-          } as ClusterData
-        } else {
-          return {
-            id: (props as Business).id,
-            properties: { ...(props as Business), cluster: false },
-            geometry: {
-              type: 'Point',
-              coordinates: item.geometry.coordinates,
-            },
-          } as PointData
-        }
-      })
-
-      setClusters(typedResults)
-    },
-    [viewport]
-  )
-
-  const handleViewportChange = (newViewport: Viewport) => {
-    setViewport(newViewport)
-  }
-
-  // Update clusters when viewport changes
-  useEffect(() => {
-    if (superclusterRef.current) {
-      updateClusters(superclusterRef.current)
-    }
-  }, [viewport, updateClusters])
-
-  const handleClusterClick = (clusterId: number) => {
-    if (!superclusterRef.current) return
-
-    const cluster = superclusterRef.current.getClusterExpansionZoom(clusterId)
-    const clusterCenter = superclusterRef.current
-      .getClusters([-180, -85, 180, 85], Math.floor(viewport.zoom))
-      .find((item) => {
-        const props = item.properties as any
-        return props?.cluster_id === clusterId
-      })
-
-    if (clusterCenter) {
-      setViewport({
-        ...viewport,
-        latitude: clusterCenter.geometry.coordinates[1],
-        longitude: clusterCenter.geometry.coordinates[0],
-        zoom: cluster,
-      })
-    }
-  }
-
-  const handleResetView = () => {
-    if (businesses.length === 0) return
-
-    // Calculate bounds from all businesses
-    let minLat = businesses[0].latitude
-    let maxLat = businesses[0].latitude
-    let minLon = businesses[0].longitude
-    let maxLon = businesses[0].longitude
-
-    businesses.forEach((business) => {
-      minLat = Math.min(minLat, business.latitude)
-      maxLat = Math.max(maxLat, business.latitude)
-      minLon = Math.min(minLon, business.longitude)
-      maxLon = Math.max(maxLon, business.longitude)
-    })
-
-    // Center map on bounds with padding
-    const centerLat = (minLat + maxLat) / 2
-    const centerLon = (minLon + maxLon) / 2
-    const distance = Math.max(maxLat - minLat, maxLon - minLon)
-
-    setViewport({
-      latitude: centerLat,
-      longitude: centerLon,
-      zoom: Math.max(8, 12 - Math.log2(distance * 55)),
-    })
-  }
-
   if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -234,60 +91,27 @@ export default function SearchResultsMap({
 
   return (
     <div className="relative w-full h-full">
-      <Map
-        ref={mapRef}
-        {...viewport}
-        onMove={(evt) => handleViewportChange(evt.viewState)}
-        style={{ width: '100%', height: '100%' }}
-        mapStyle={MAP_CONSTANTS.MAP_STYLE_URL}
-        minZoom={MAP_CONSTANTS.MIN_ZOOM}
-        maxZoom={MAP_CONSTANTS.MAX_ZOOM}
+      <MapContainer
+        center={[36.1627, -86.7816]}
+        zoom={13}
+        style={{ height: '100%', width: '100%' }}
+        minZoom={8}
+        maxZoom={20}
       >
-        {/* Render clusters and individual markers */}
-        {clusters.map((item) => {
-          const isCluster = 'properties' in item && item.properties.cluster === true
-          const coords = item.geometry.coordinates as [number, number]
-
-          if (isCluster) {
-            const clusterItem = item as ClusterData
-            return (
-              <ClusterMarker
-                key={`cluster-${clusterItem.properties.cluster_id}`}
-                clusterId={clusterItem.properties.cluster_id}
-                longitude={coords[0]}
-                latitude={coords[1]}
-                count={clusterItem.properties.point_count}
-                onClick={() => handleClusterClick(clusterItem.properties.cluster_id)}
-              />
-            )
-          } else {
-            const pointItem = item as PointData
-            return (
-              <MapMarker
-                key={`marker-${pointItem.id}`}
-                business={pointItem.properties}
-                isActive={selectedBusinessId === pointItem.id}
-                onClick={() => onBusinessSelect?.(pointItem.id)}
-                onHover={(id) => onBusinessHover?.(id)}
-              />
-            )
-          }
-        })}
-      </Map>
-
-      {/* Map Controls */}
-      <div className="absolute top-4 right-4 flex gap-2 z-10">
-        <button
-          onClick={handleResetView}
-          className="bg-white hover:bg-gray-100 text-gray-800 font-medium px-4 py-2 rounded-lg shadow-md transition border border-gray-200"
-          title="Fit all businesses in view"
-        >
-          Reset View
-        </button>
-      </div>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <MapController
+          businesses={businesses}
+          selectedBusinessId={selectedBusinessId}
+          onBusinessSelect={onBusinessSelect}
+          onBusinessHover={onBusinessHover}
+        />
+      </MapContainer>
 
       {/* Business Count Badge */}
-      <div className="absolute top-4 left-4 bg-white px-4 py-2 rounded-lg shadow-md border border-gray-200 z-10">
+      <div className="absolute top-4 left-4 bg-white px-4 py-2 rounded-lg shadow-md border border-gray-200 z-[500]">
         <p className="text-sm font-medium text-gray-800">
           {businesses.length} business{businesses.length !== 1 ? 'es' : ''}
         </p>
