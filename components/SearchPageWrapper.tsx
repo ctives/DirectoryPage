@@ -1,0 +1,206 @@
+'use client'
+
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import SearchForm from './SearchForm'
+import SearchResultsContainer from './SearchResultsContainer'
+
+interface HeroImage {
+  src: string
+  alt: string
+}
+
+interface SearchPageWrapperProps {
+  selectedImage: HeroImage
+}
+
+export default function SearchPageWrapper({ selectedImage }: SearchPageWrapperProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState({
+    serviceType: 'both',
+    neighborhood: '',
+    zipCode: '',
+  })
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [hasSearched, setHasSearched] = useState(true)
+
+  // Load all businesses on component mount
+  useEffect(() => {
+    const loadInitialBusinesses = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        const response = await fetch('/api/search')
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to load businesses')
+        }
+
+        setSearchResults(result.data || [])
+        setHasSearched(true)
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred'
+        setError(errorMessage)
+        console.error('Error loading businesses:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadInitialBusinesses()
+  }, [])
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const params = new URLSearchParams()
+      if (searchQuery) params.append('query', searchQuery)
+      if (filters.serviceType && filters.serviceType !== 'both') {
+        params.append('serviceType', filters.serviceType)
+      }
+      if (filters.neighborhood) params.append('neighborhood', filters.neighborhood)
+      if (filters.zipCode) params.append('zipCode', filters.zipCode)
+
+      const response = await fetch(`/api/search?${params.toString()}`)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Search failed')
+      }
+
+      setSearchResults(result.data || [])
+      setHasSearched(true)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
+      setError(errorMessage)
+      setSearchResults([])
+      setHasSearched(true)
+      console.error('Search error:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFilters(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleShowAdvanced = (show: boolean) => {
+    // Placeholder for advanced search toggling
+  }
+
+  return (
+    <div className="min-h-screen bg-neutral-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="text-2xl font-bold text-primary-700 hover:text-primary-800">
+              Nashville Cleaning Directory
+            </Link>
+            <div className="flex gap-4 items-center">
+              <Link
+                href="/auth/login"
+                className="text-neutral-700 hover:text-primary-600 font-medium"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section with Rotating Background Image */}
+      <section className="relative h-[600px] w-full overflow-hidden bg-gray-900">
+        {/* Background Image Container */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={selectedImage.src}
+            alt={selectedImage.alt}
+            fill
+            priority
+            sizes="100vw"
+            quality={85}
+            style={{
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }}
+          />
+        </div>
+
+        {/* Dark gradient overlay for text readability */}
+        <div className="absolute inset-0 z-5 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
+
+        {/* Hero Content */}
+        <div className="absolute inset-0 z-10 flex h-full flex-col items-center justify-center px-4">
+          <div className="w-full max-w-4xl">
+            <h1 className="mb-4 text-center text-5xl font-bold text-white drop-shadow-lg md:text-6xl">
+              Find Trusted Cleaning Services Near You
+            </h1>
+            <p className="mb-8 text-center text-lg text-white/95 drop-shadow font-medium md:text-xl">
+              Connect with local cleaners, read reviews, and book with confidence
+            </p>
+
+            {/* Search Form Component */}
+            <SearchForm
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onSearch={handleSearch}
+              onShowAdvanced={handleShowAdvanced}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Results Section */}
+      {hasSearched && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {error && (
+            <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800">Error: {error}</p>
+            </div>
+          )}
+
+          {!error && (
+            <>
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-bold text-neutral-900">
+                  Cleaning Services {searchQuery && `for "${searchQuery}"`}
+                </h2>
+                <p className="text-neutral-600">{searchResults.length} results</p>
+              </div>
+
+              <SearchResultsContainer
+                businesses={searchResults}
+                isLoading={isLoading}
+              />
+            </>
+          )}
+        </section>
+      )}
+
+      {/* Footer */}
+      <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p>&copy; 2024 Nashville Cleaning Directory. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  )
+}
