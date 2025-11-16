@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import { SERVICE_TYPE_COLORS } from '@/lib/map-constants'
@@ -94,9 +95,12 @@ export default function MapMarker({
             <p className="text-gray-600 text-sm mb-2 line-clamp-2">{business.description}</p>
           )}
 
-          <button className="w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 rounded transition text-sm">
+          <Link
+            href={`/business/${business.id}`}
+            className="block w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-2 rounded transition text-sm text-center"
+          >
             View Details
-          </button>
+          </Link>
         </div>
       </Popup>
     </Marker>

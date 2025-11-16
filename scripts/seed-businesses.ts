@@ -93,6 +93,11 @@ function generateRandomBusiness() {
   const rating = Number((randomRange(38, 50) / 10).toFixed(1)) // 3.8 to 5.0
   const reviewCount = randomRange(10, 500)
 
+  // Generate random coordinates around Nashville (36.1627, -86.7816)
+  // Nashville metro area is roughly within 0.15 degrees latitude/longitude
+  const latitude = 36.1627 + (Math.random() - 0.5) * 0.3
+  const longitude = -86.7816 + (Math.random() - 0.5) * 0.3
+
   return {
     name: businessName,
     description: randomElement(descriptions),
@@ -103,6 +108,8 @@ function generateRandomBusiness() {
     city: 'Nashville',
     state: 'TN',
     zip_code: zipCode,
+    latitude: Number(latitude.toFixed(6)),
+    longitude: Number(longitude.toFixed(6)),
     years_in_business: yearsInBusiness,
     service_type: serviceType,
     status: 'active',

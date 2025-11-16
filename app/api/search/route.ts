@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Build the query
     let sqlQuery = supabase
       .from('businesses')
-      .select('id, name, description, average_rating, review_count, service_type, zip_code, address')
+      .select('id, name, description, average_rating, review_count, service_type, zip_code, address, latitude, longitude')
       .eq('status', 'active')
 
     // Filter by service type

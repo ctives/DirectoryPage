@@ -1,5 +1,41 @@
 # Development Checklist - 30 Day MVP
 
+## 🚀 IMMEDIATE NEXT STEPS (Do These First!)
+
+### This Week's Priority
+1. **[ ] Test Map in Development**
+   - [ ] Run `npm run dev` and verify map renders
+   - [ ] Test marker clustering, selection, and popups
+   - [ ] Verify mobile toggle works
+   - [ ] Test responsive layout at all breakpoints
+
+2. **[ ] Create Business Detail Page** (`/business/[id]`)
+   - [ ] Create route structure
+   - [ ] Build profile layout with name, rating, hours, contact
+   - [ ] Add map showing business location
+   - [ ] Add "Get Directions" button
+   - [ ] Add "Contact Business" CTA
+   - [ ] Create 404 page for invalid IDs
+   - [ ] Update all "View Details" links to point here
+
+3. **[ ] Setup Business API Route**
+   - [ ] Create `app/api/business/[id]/route.ts`
+   - [ ] Fetch individual business data
+   - [ ] Add caching (revalidate 1 hour)
+   - [ ] Error handling for missing businesses
+
+4. **[ ] Connect Business Links**
+   - [ ] Update search result cards to link properly
+   - [ ] Update map popups to link properly
+   - [ ] Test navigation flow: Search → Detail → Back
+
+5. **[ ] Database Schema Verification**
+   - [ ] Ensure all required fields exist in businesses table
+   - [ ] Check for missing data in existing records
+   - [ ] Create database migrations if needed
+
+---
+
 ## Week 1: Foundation & Setup (Days 1-7)
 
 ### Days 1-2: Core Setup
