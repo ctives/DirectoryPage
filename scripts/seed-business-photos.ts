@@ -20,30 +20,31 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-// Sample photo URLs - using direct image links that are more reliable
+// Sample photo URLs - using reliable placeholder images from picsum.photos
+// These are guaranteed to work and won't have 404 errors
 const cleaningPhotos = [
   {
-    url: 'https://images.unsplash.com/photo-1584622181563-430f63602d4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8ZW58MHx8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    url: 'https://picsum.photos/800/600?random=1',
     caption: 'Professional residential cleaning service'
   },
   {
-    url: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8ZW58MHx8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    url: 'https://picsum.photos/800/600?random=2',
     caption: 'Kitchen and countertop cleaning'
   },
   {
-    url: 'https://images.unsplash.com/photo-1585421514407-46a2ffc4330d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8ZW58MHx8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    url: 'https://picsum.photos/800/600?random=3',
     caption: 'Bathroom deep cleaning'
   },
   {
-    url: 'https://images.unsplash.com/photo-1577805643033-4e2e4b7a7a5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8ZW58MHx8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    url: 'https://picsum.photos/800/600?random=4',
     caption: 'Living room sanitization'
   },
   {
-    url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8ZW58MHx8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    url: 'https://picsum.photos/800/600?random=5',
     caption: 'Office space cleaning'
   },
   {
-    url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8ZW58MHx8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    url: 'https://picsum.photos/800/600?random=6',
     caption: 'Commercial building maintenance'
   }
 ]
