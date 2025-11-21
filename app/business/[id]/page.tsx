@@ -8,6 +8,7 @@ import { MapPin, Phone, Mail, Globe, ArrowLeft, Shield, Check } from 'lucide-rea
 import BusinessPhotoGallery from '@/components/BusinessPhotoGallery'
 import RatingBadges from '@/components/RatingBadges'
 import SocialMediaLinks from '@/components/SocialMediaLinks'
+import ClaimBusinessBanner from '@/components/ClaimBusinessBanner'
 
 // Dynamically import map to avoid SSR issues
 const BusinessDetailMap = dynamic(
@@ -61,6 +62,7 @@ interface Business {
   owner_name?: string
   owner_email?: string
   created_at?: string
+  claimed?: boolean
 }
 
 interface PageParams {
@@ -146,6 +148,11 @@ export default function BusinessDetailPage() {
           <ArrowLeft size={20} />
           Back to Search
         </Link>
+
+        {/* Claim Business Banner - Show if not claimed */}
+        {business && !business.claimed && (
+          <ClaimBusinessBanner businessId={business.id} businessName={business.name} />
+        )}
 
         {/* Header Section - Combined with Contact Info */}
         <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">

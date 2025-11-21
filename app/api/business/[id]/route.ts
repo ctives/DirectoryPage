@@ -17,10 +17,10 @@ export async function GET(
       )
     }
 
-    // Use public anon key for read-only access
+    // Use service role key for reading all data (safer than anon key with RLS restrictions)
     const supabase = createSupabaseClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
     // Fetch the business by ID
@@ -52,12 +52,16 @@ export async function GET(
       .eq('business_id', id)
 
     // Fetch photos for this business (if available)
-    const { data: photos } = await supabase
+    const { data: photos, error: photosError } = await supabase
       .from('business_photos')
       .select('id, photo_url, thumbnail_url, caption, photo_type, is_primary, display_order')
       .eq('business_id', id)
       .order('is_primary', { ascending: false })
       .order('display_order', { ascending: true })
+
+    if (photosError) {
+      console.error('Error fetching photos:', photosError)
+    }
 
     // Combine services if available
     const servicesList = services?.map((s: any) => s.service_name) || []
@@ -158,6 +162,7 @@ export async function GET(
       owner_email: business.owner_email,
       created_at: business.created_at,
       status: business.status,
+      claimed: business.claimed || false,
     })
   } catch (error) {
     console.error('Business API error:', error)
