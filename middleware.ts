@@ -21,6 +21,7 @@ const publicRoutes = [
   '/privacy',
   '/auth/verify-email',
   '/business/:path*', // Public business detail pages
+  '/claim/:path*', // Business claiming flow (public, no auth required)
 ]
 
 export default withAuth(
@@ -68,8 +69,10 @@ export default withAuth(
           return true
         }
 
-        // Allow public API routes (search, business detail)
-        if (pathname.startsWith('/api/search') || pathname.startsWith('/api/business')) {
+        // Allow public API routes (search, business detail, claim)
+        if (pathname.startsWith('/api/search') ||
+            pathname.startsWith('/api/business') ||
+            pathname.startsWith('/api/claim')) {
           return true
         }
 
