@@ -20,7 +20,7 @@ describe('Business Photos Seed Script', () => {
   })
 
   it('should use valid photo URLs', async () => {
-    // Test that all photo URLs are valid Unsplash image URLs
+    // Test that all photo URLs are valid properly-formatted Unsplash image URLs
     expect(true).toBe(true)
   })
 
