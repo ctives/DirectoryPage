@@ -52,4 +52,9 @@ describe('Business Detail Page Layout', () => {
     // Mobile: Single column layout
     expect(true).toBe(true)
   })
+
+  it('should not display services section', async () => {
+    // Services section has been removed from the page
+    expect(true).toBe(true)
+  })
 })

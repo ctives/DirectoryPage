@@ -291,23 +291,6 @@ export default function BusinessDetailPage() {
           </div>
         )}
 
-        {/* Services Section */}
-        {business.services && business.services.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Services Offered</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {business.services.map((service, idx) => (
-                <div
-                  key={idx}
-                  className="bg-primary-100 text-primary-700 rounded px-3 py-2 font-medium text-sm"
-                >
-                  {service}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Review CTA Section */}
         <div className="bg-gradient-to-r from-primary-sage to-primary-sage-dark rounded-lg shadow-md p-6 md:p-8 text-white">
           <h2 className="text-2xl font-bold mb-3">Share Your Experience</h2>
