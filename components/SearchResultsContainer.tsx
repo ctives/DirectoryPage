@@ -28,6 +28,8 @@ interface SearchResultsContainerProps {
   isLoading?: boolean
 }
 
+const ITEMS_PER_PAGE = 25
+
 export default function SearchResultsContainer({
   businesses,
   isLoading,
@@ -36,6 +38,7 @@ export default function SearchResultsContainer({
   const [hoveredBusinessId, setHoveredBusinessId] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [showMap, setShowMap] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Detect mobile view
   useEffect(() => {
@@ -58,6 +61,17 @@ export default function SearchResultsContainer({
   const handleBusinessHover = useCallback((businessId: string | null) => {
     setHoveredBusinessId(businessId)
   }, [])
+
+  // Reset to page 1 when search results change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [businesses])
+
+  // Calculate pagination
+  const totalPages = Math.ceil(businesses.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+  const paginatedBusinesses = businesses.slice(startIndex, endIndex)
 
   if (isLoading) {
     return (
@@ -112,18 +126,47 @@ export default function SearchResultsContainer({
             />
           </div>
         ) : (
-          <div className="space-y-4">
-            {businesses.map((business) => (
-              <BusinessCard
-                key={business.id}
-                business={business}
-                isActive={business.id === selectedBusinessId}
-                isHovered={business.id === hoveredBusinessId}
-                onSelect={handleBusinessSelect}
-                onHover={handleBusinessHover}
-              />
-            ))}
-          </div>
+          <>
+            <div className="space-y-4">
+              {paginatedBusinesses.map((business) => (
+                <BusinessCard
+                  key={business.id}
+                  business={business}
+                  isActive={business.id === selectedBusinessId}
+                  isHovered={business.id === hoveredBusinessId}
+                  onSelect={handleBusinessSelect}
+                  onHover={handleBusinessHover}
+                />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between gap-2 mt-4 px-2">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 rounded-lg bg-gray-200 text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition font-medium"
+                >
+                  Previous
+                </button>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-sm text-gray-600">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 rounded-lg bg-gray-200 text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition font-medium"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     )
@@ -133,17 +176,49 @@ export default function SearchResultsContainer({
   return (
     <div className="flex gap-6 h-full">
       {/* Left: Business List */}
-      <div className="flex-1 lg:flex-0 lg:w-2/5 overflow-y-auto space-y-4">
-        {businesses.map((business) => (
-          <BusinessCard
-            key={business.id}
-            business={business}
-            isActive={business.id === selectedBusinessId}
-            isHovered={business.id === hoveredBusinessId}
-            onSelect={handleBusinessSelect}
-            onHover={handleBusinessHover}
-          />
-        ))}
+      <div className="flex-1 lg:flex-0 lg:w-2/5 overflow-y-auto">
+        <div className="space-y-4">
+          {paginatedBusinesses.map((business) => (
+            <BusinessCard
+              key={business.id}
+              business={business}
+              isActive={business.id === selectedBusinessId}
+              isHovered={business.id === hoveredBusinessId}
+              onSelect={handleBusinessSelect}
+              onHover={handleBusinessHover}
+            />
+          ))}
+        </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="sticky bottom-0 left-0 right-0 flex flex-col gap-3 mt-6 p-4 bg-white border-t border-gray-200 rounded-b-lg">
+            <div className="flex items-center justify-between gap-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 rounded-lg bg-gray-200 text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition font-medium text-sm"
+              >
+                Previous
+              </button>
+
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 rounded-lg bg-gray-200 text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition font-medium text-sm"
+              >
+                Next
+              </button>
+            </div>
+            <div className="text-xs text-gray-500 text-center">
+              Showing {startIndex + 1}–{Math.min(endIndex, businesses.length)} of {businesses.length}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Right: Map */}
