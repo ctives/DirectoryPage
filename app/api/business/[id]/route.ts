@@ -51,8 +51,85 @@ export async function GET(
       .select('area_name')
       .eq('business_id', id)
 
+    // Fetch photos for this business (if available)
+    const { data: photos } = await supabase
+      .from('business_photos')
+      .select('id, photo_url, thumbnail_url, caption, photo_type, is_primary, display_order')
+      .eq('business_id', id)
+      .order('is_primary', { ascending: false })
+      .order('display_order', { ascending: true })
+
     // Combine services if available
     const servicesList = services?.map((s: any) => s.service_name) || []
+
+    // Build ratings array
+    const ratings = []
+    if (business.average_rating && business.average_rating > 0) {
+      ratings.push({
+        source: 'our_rating',
+        rating: business.average_rating,
+        reviewCount: business.review_count || 0,
+      })
+    }
+    if (business.google_rating && business.google_rating > 0) {
+      ratings.push({
+        source: 'google',
+        rating: business.google_rating,
+        reviewCount: business.google_review_count,
+        url: business.google_reviews_url,
+      })
+    }
+    if (business.yelp_rating && business.yelp_rating > 0) {
+      ratings.push({
+        source: 'yelp',
+        rating: business.yelp_rating,
+        reviewCount: business.yelp_review_count,
+        url: business.yelp_url,
+      })
+    }
+
+    // Build social media array
+    const socialMedia = []
+    if (business.facebook_url) {
+      socialMedia.push({
+        platform: 'facebook',
+        url: business.facebook_url,
+        handle: business.facebook_handle,
+      })
+    }
+    if (business.instagram_url) {
+      socialMedia.push({
+        platform: 'instagram',
+        url: business.instagram_url,
+        handle: business.instagram_handle,
+      })
+    }
+    if (business.twitter_url) {
+      socialMedia.push({
+        platform: 'twitter',
+        url: business.twitter_url,
+        handle: business.twitter_handle,
+      })
+    }
+    if (business.linkedin_url) {
+      socialMedia.push({
+        platform: 'linkedin',
+        url: business.linkedin_url,
+      })
+    }
+    if (business.youtube_url) {
+      socialMedia.push({
+        platform: 'youtube',
+        url: business.youtube_url,
+      })
+    }
+    if (business.tiktok_url) {
+      socialMedia.push({
+        platform: 'tiktok',
+        url: business.tiktok_url,
+        handle: business.tiktok_handle,
+      })
+    }
 
     // Return the business with additional details
     return NextResponse.json({
@@ -70,9 +147,13 @@ export async function GET(
       review_count: business.review_count,
       service_type: business.service_type,
       years_in_business: business.years_in_business,
-      insurance_verification: business.insurance_verification,
+      insurance_verified: business.insurance_verified,
+      background_check_verified: business.background_check_verified,
       services: servicesList,
       service_areas: serviceAreas?.map((sa: any) => sa.area_name) || [],
+      photos: photos || [],
+      ratings,
+      socialMedia,
       owner_name: business.owner_name,
       owner_email: business.owner_email,
       created_at: business.created_at,

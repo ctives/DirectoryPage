@@ -12,7 +12,16 @@ const protectedRoutes = [
 ]
 
 // Public routes (no auth required)
-const publicRoutes = ['/auth/login', '/auth/signup', '/auth/error', '/', '/terms', '/privacy', '/auth/verify-email']
+const publicRoutes = [
+  '/auth/login',
+  '/auth/signup',
+  '/auth/error',
+  '/',
+  '/terms',
+  '/privacy',
+  '/auth/verify-email',
+  '/business/:path*', // Public business detail pages
+]
 
 export default withAuth(
   function middleware(request: NextRequest) {
@@ -48,13 +57,19 @@ export default withAuth(
         // Check if path requires authentication
         const pathname = req.nextUrl.pathname
 
-        // Allow public routes
-        if (publicRoutes.includes(pathname)) {
+        // Allow public routes (including dynamic business routes)
+        if (publicRoutes.some((route) => {
+          if (route.includes(':path*')) {
+            const baseRoute = route.replace('/:path*', '')
+            return pathname.startsWith(baseRoute)
+          }
+          return pathname === route
+        })) {
           return true
         }
 
-        // Allow public API routes (search)
-        if (pathname.startsWith('/api/search')) {
+        // Allow public API routes (search, business detail)
+        if (pathname.startsWith('/api/search') || pathname.startsWith('/api/business')) {
           return true
         }
 

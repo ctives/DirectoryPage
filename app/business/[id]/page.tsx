@@ -4,13 +4,38 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { MapPin, Phone, Mail, Globe, ArrowLeft, Share2 } from 'lucide-react'
+import { MapPin, Phone, Mail, Globe, ArrowLeft, Share2, Shield, Check } from 'lucide-react'
+import BusinessPhotoGallery from '@/components/BusinessPhotoGallery'
+import RatingBadges from '@/components/RatingBadges'
+import SocialMediaLinks from '@/components/SocialMediaLinks'
 
 // Dynamically import map to avoid SSR issues
 const BusinessDetailMap = dynamic(
   () => import('@/components/BusinessDetailMap'),
   { ssr: false, loading: () => <div className="w-full h-96 bg-gray-100 flex items-center justify-center rounded-lg">Loading map...</div> }
 )
+
+interface Photo {
+  id: string
+  photo_url: string
+  thumbnail_url?: string
+  caption?: string
+  photo_type?: 'portfolio' | 'before_after' | 'team' | 'facility'
+  is_primary?: boolean
+}
+
+interface Rating {
+  source: 'our_rating' | 'google' | 'yelp'
+  rating: number
+  reviewCount?: number
+  url?: string
+}
+
+interface SocialMedia {
+  platform: 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'tiktok' | 'youtube'
+  url: string
+  handle?: string
+}
 
 interface Business {
   id: string
@@ -27,8 +52,12 @@ interface Business {
   review_count?: number
   service_type?: 'residential' | 'commercial' | 'both'
   years_in_business?: number
-  insurance_verification?: boolean
+  insurance_verified?: boolean
+  background_check_verified?: boolean
   services?: string[]
+  photos?: Photo[]
+  ratings?: Rating[]
+  socialMedia?: SocialMedia[]
   owner_name?: string
   owner_email?: string
   created_at?: string
@@ -179,6 +208,30 @@ export default function BusinessDetailPage() {
             <p className="text-gray-600 text-lg mb-6">{business.description}</p>
           )}
 
+        {/* Ratings */}
+        {business.ratings && business.ratings.length > 0 && (
+          <div className="mb-6 pt-4 border-t border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Ratings</h3>
+            <RatingBadges ratings={business.ratings} />
+          </div>
+        )}
+
+        {/* Verification Badges */}
+        <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 mb-6">
+          {business.insurance_verified && (
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
+              <Shield size={18} className="text-green-600" />
+              <span className="font-medium text-green-700 text-sm">Insurance Verified</span>
+            </div>
+          )}
+          {business.background_check_verified && (
+            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg">
+              <Check size={18} className="text-blue-600" />
+              <span className="font-medium text-blue-700 text-sm">Background Checked</span>
+            </div>
+          )}
+        </div>
+
           {/* Trust Indicators */}
           <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
             {business.years_in_business && (
@@ -201,6 +254,11 @@ export default function BusinessDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Photo Gallery */}
+        {business.photos && business.photos.length > 0 && (
+          <BusinessPhotoGallery photos={business.photos} businessName={business.name} />
+        )}
 
         {/* Map Section */}
         {business.latitude && business.longitude && (
@@ -318,6 +376,14 @@ export default function BusinessDetailPage() {
               <p className="text-sm text-gray-600 mt-6 pt-6 border-t border-gray-200">
                 Questions? <a href={`mailto:${business.email}`} className="text-primary-sage hover:text-primary-sage-dark font-medium">Send an email</a>
               </p>
+            )}
+
+            {/* Social Media Links */}
+            {business.socialMedia && business.socialMedia.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-sm font-medium text-gray-900 mb-3">Follow on Social Media</p>
+                <SocialMediaLinks socialMedia={business.socialMedia} />
+              </div>
             )}
           </div>
         </div>
