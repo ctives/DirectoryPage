@@ -147,143 +147,138 @@ export default function BusinessDetailPage() {
           Back to Search
         </Link>
 
-        {/* Header Section */}
+        {/* Header Section - Combined with Contact Info */}
         <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{business.name}</h1>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Left Column - Business Info */}
+            <div className="md:col-span-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{business.name}</h1>
 
-          {business.average_rating && (
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-yellow-500 text-xl">★</span>
-                <span className="font-semibold text-gray-900">{business.average_rating}</span>
-                <span className="text-gray-600">({business.review_count || 0} reviews)</span>
-              </div>
-              {business.service_type && (
-                <span className="bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded">
-                  {business.service_type === 'both'
-                    ? 'Residential & Commercial'
-                    : business.service_type === 'residential'
-                    ? 'Residential'
-                    : 'Commercial'}
-                </span>
-              )}
-            </div>
-          )}
-
-          {business.description && (
-            <p className="text-gray-600 text-lg mb-6">{business.description}</p>
-          )}
-
-        {/* Ratings */}
-        {business.ratings && business.ratings.length > 0 && (
-          <div className="mb-6 pt-4 border-t border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Ratings</h3>
-            <RatingBadges ratings={business.ratings} />
-          </div>
-        )}
-
-        {/* Verification Badges */}
-        <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 mb-6">
-          {business.insurance_verified && (
-            <div className="flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
-              <Shield size={18} className="text-green-600" />
-              <span className="font-medium text-green-700 text-sm">Insurance Verified</span>
-            </div>
-          )}
-          {business.background_check_verified && (
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg">
-              <Check size={18} className="text-blue-600" />
-              <span className="font-medium text-blue-700 text-sm">Background Checked</span>
-            </div>
-          )}
-        </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
-            {business.years_in_business && (
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">📅</span>
-                <div>
-                  <p className="text-sm text-gray-600">In Business</p>
-                  <p className="font-semibold text-gray-900">{business.years_in_business} years</p>
-                </div>
-              </div>
-            )}
-            {business.insurance_verification && (
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">✓</span>
-                <div>
-                  <p className="text-sm text-gray-600">Verified</p>
-                  <p className="font-semibold text-gray-900">Insurance Verified</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Contact Information Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
-
-          <div className="space-y-4">
-            {business.address && (
-              <a
-                href={`https://maps.google.com/?q=${encodeURIComponent(business.address)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-              >
-                <MapPin size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Address</p>
-                  <p className="font-medium text-gray-900 hover:text-primary-sage">{business.address}</p>
-                  {business.zip_code && (
-                    <p className="text-sm text-gray-600">{business.zip_code}</p>
+              {business.average_rating && (
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-yellow-500 text-xl">★</span>
+                    <span className="font-semibold text-gray-900">{business.average_rating}</span>
+                    <span className="text-gray-600">({business.review_count || 0} reviews)</span>
+                  </div>
+                  {business.service_type && (
+                    <span className="bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded">
+                      {business.service_type === 'both'
+                        ? 'Residential & Commercial'
+                        : business.service_type === 'residential'
+                        ? 'Residential'
+                        : 'Commercial'}
+                    </span>
                   )}
                 </div>
-              </a>
-            )}
+              )}
 
-            {business.phone && (
-              <a
-                href={`tel:${business.phone}`}
-                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-              >
-                <Phone size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Phone</p>
-                  <p className="font-medium text-gray-900 hover:text-primary-sage">{business.phone}</p>
-                </div>
-              </a>
-            )}
+              {business.description && (
+                <p className="text-gray-600 text-lg mb-6">{business.description}</p>
+              )}
 
-            {business.email && (
-              <a
-                href={`mailto:${business.email}`}
-                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-              >
-                <Mail size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Email</p>
-                  <p className="font-medium text-gray-900 hover:text-primary-sage break-all">{business.email}</p>
+              {/* Ratings */}
+              {business.ratings && business.ratings.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Ratings</h3>
+                  <RatingBadges ratings={business.ratings} />
                 </div>
-              </a>
-            )}
+              )}
 
-            {business.website && (
-              <a
-                href={business.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-              >
-                <Globe size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Website</p>
-                  <p className="font-medium text-gray-900 hover:text-primary-sage break-all">{business.website}</p>
-                </div>
-              </a>
-            )}
+              {/* Verification Badges */}
+              <div className="flex flex-wrap gap-3 mb-4">
+                {business.insurance_verified && (
+                  <div className="flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
+                    <Shield size={18} className="text-green-600" />
+                    <span className="font-medium text-green-700 text-sm">Insurance Verified</span>
+                  </div>
+                )}
+                {business.background_check_verified && (
+                  <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg">
+                    <Check size={18} className="text-blue-600" />
+                    <span className="font-medium text-blue-700 text-sm">Background Checked</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap gap-4">
+                {business.years_in_business && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">📅</span>
+                    <div>
+                      <p className="text-sm text-gray-600">In Business</p>
+                      <p className="font-semibold text-gray-900">{business.years_in_business} years</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column - Contact Information */}
+            <div className="md:col-span-1">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Contact</h3>
+              <div className="space-y-3">
+                {business.address && (
+                  <a
+                    href={`https://maps.google.com/?q=${encodeURIComponent(business.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2 hover:opacity-70 transition"
+                  >
+                    <MapPin size={20} className="text-primary-sage flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-600 mb-0.5">Address</p>
+                      <p className="font-medium text-gray-900 text-sm hover:text-primary-sage break-words">{business.address}</p>
+                      {business.zip_code && (
+                        <p className="text-xs text-gray-600">{business.zip_code}</p>
+                      )}
+                    </div>
+                  </a>
+                )}
+
+                {business.phone && (
+                  <a
+                    href={`tel:${business.phone}`}
+                    className="flex items-start gap-2 hover:opacity-70 transition"
+                  >
+                    <Phone size={20} className="text-primary-sage flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-600 mb-0.5">Phone</p>
+                      <p className="font-medium text-gray-900 text-sm hover:text-primary-sage break-all">{business.phone}</p>
+                    </div>
+                  </a>
+                )}
+
+                {business.email && (
+                  <a
+                    href={`mailto:${business.email}`}
+                    className="flex items-start gap-2 hover:opacity-70 transition"
+                  >
+                    <Mail size={20} className="text-primary-sage flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-600 mb-0.5">Email</p>
+                      <p className="font-medium text-gray-900 text-sm hover:text-primary-sage break-all">{business.email}</p>
+                    </div>
+                  </a>
+                )}
+
+                {business.website && (
+                  <a
+                    href={business.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2 hover:opacity-70 transition"
+                  >
+                    <Globe size={20} className="text-primary-sage flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-600 mb-0.5">Website</p>
+                      <p className="font-medium text-gray-900 text-sm hover:text-primary-sage break-all">{business.website}</p>
+                    </div>
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
