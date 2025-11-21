@@ -154,22 +154,15 @@ export default function BusinessDetailPage() {
             <div className="md:col-span-2">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{business.name}</h1>
 
-              {business.average_rating && (
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-500 text-xl">★</span>
-                    <span className="font-semibold text-gray-900">{business.average_rating}</span>
-                    <span className="text-gray-600">({business.review_count || 0} reviews)</span>
-                  </div>
-                  {business.service_type && (
-                    <span className="bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded">
-                      {business.service_type === 'both'
-                        ? 'Residential & Commercial'
-                        : business.service_type === 'residential'
-                        ? 'Residential'
-                        : 'Commercial'}
-                    </span>
-                  )}
+              {business.service_type && (
+                <div className="mb-4">
+                  <span className="bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded">
+                    {business.service_type === 'both'
+                      ? 'Residential & Commercial'
+                      : business.service_type === 'residential'
+                      ? 'Residential'
+                      : 'Commercial'}
+                  </span>
                 </div>
               )}
 

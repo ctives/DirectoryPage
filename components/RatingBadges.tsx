@@ -19,14 +19,19 @@ export default function RatingBadges({ ratings }: RatingBadgesProps) {
     return null
   }
 
+  // Filter out our_rating, only show Google and Yelp ratings
+  const filteredRatings = ratings.filter((rating) => rating.source !== 'our_rating')
+
+  if (filteredRatings.length === 0) {
+    return null
+  }
+
   const getRatingColor = (source: string) => {
     switch (source) {
       case 'google':
         return 'bg-blue-50 border-blue-200 text-blue-900'
       case 'yelp':
         return 'bg-red-50 border-red-200 text-red-900'
-      case 'our_rating':
-        return 'bg-primary-50 border-primary-200 text-primary-900'
       default:
         return 'bg-gray-50 border-gray-200 text-gray-900'
     }
@@ -38,8 +43,6 @@ export default function RatingBadges({ ratings }: RatingBadgesProps) {
         return '🔍'
       case 'yelp':
         return '★'
-      case 'our_rating':
-        return '⭐'
       default:
         return '★'
     }
@@ -51,8 +54,6 @@ export default function RatingBadges({ ratings }: RatingBadgesProps) {
         return 'Google Rating'
       case 'yelp':
         return 'Yelp Rating'
-      case 'our_rating':
-        return 'Our Rating'
       default:
         return 'Rating'
     }
@@ -60,7 +61,7 @@ export default function RatingBadges({ ratings }: RatingBadgesProps) {
 
   return (
     <div className="flex flex-wrap gap-3">
-      {ratings.map((rating, idx) => (
+      {filteredRatings.map((rating, idx) => (
         <a
           key={idx}
           href={rating.url}

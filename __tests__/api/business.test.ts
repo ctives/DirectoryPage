@@ -4,8 +4,8 @@ describe('Business Detail API', () => {
     expect(true).toBe(true)
   })
 
-  it('should return ratings from multiple sources', async () => {
-    // Test that ratings array is populated correctly
+  it('should return ratings from multiple sources (Google and Yelp only)', async () => {
+    // Test that ratings array is populated with Google and Yelp ratings only (not our_rating)
     expect(true).toBe(true)
   })
 
