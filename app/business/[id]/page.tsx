@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { MapPin, Phone, Mail, Globe, ArrowLeft, Share2, Shield, Check } from 'lucide-react'
+import { MapPin, Phone, Mail, Globe, ArrowLeft, Shield, Check } from 'lucide-react'
 import BusinessPhotoGallery from '@/components/BusinessPhotoGallery'
 import RatingBadges from '@/components/RatingBadges'
 import SocialMediaLinks from '@/components/SocialMediaLinks'
@@ -138,27 +138,6 @@ export default function BusinessDetailPage() {
     )
   }
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/business/${business.id}`
-    const text = `Check out ${business.name} on our directory`
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: business.name,
-          text: text,
-          url: url,
-        })
-      } catch (err) {
-        console.error('Share failed:', err)
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(url)
-      alert('Link copied to clipboard!')
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 md:py-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -170,39 +149,26 @@ export default function BusinessDetailPage() {
 
         {/* Header Section */}
         <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-            <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{business.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{business.name}</h1>
 
-              {business.average_rating && (
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-500 text-xl">★</span>
-                    <span className="font-semibold text-gray-900">{business.average_rating}</span>
-                    <span className="text-gray-600">({business.review_count || 0} reviews)</span>
-                  </div>
-                  {business.service_type && (
-                    <span className="bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded">
-                      {business.service_type === 'both'
-                        ? 'Residential & Commercial'
-                        : business.service_type === 'residential'
-                        ? 'Residential'
-                        : 'Commercial'}
-                    </span>
-                  )}
-                </div>
+          {business.average_rating && (
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-500 text-xl">★</span>
+                <span className="font-semibold text-gray-900">{business.average_rating}</span>
+                <span className="text-gray-600">({business.review_count || 0} reviews)</span>
+              </div>
+              {business.service_type && (
+                <span className="bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded">
+                  {business.service_type === 'both'
+                    ? 'Residential & Commercial'
+                    : business.service_type === 'residential'
+                    ? 'Residential'
+                    : 'Commercial'}
+                </span>
               )}
             </div>
-
-            {/* Share Button */}
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition"
-            >
-              <Share2 size={18} />
-              Share
-            </button>
-          </div>
+          )}
 
           {business.description && (
             <p className="text-gray-600 text-lg mb-6">{business.description}</p>
@@ -255,6 +221,72 @@ export default function BusinessDetailPage() {
           </div>
         </div>
 
+        {/* Contact Information Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
+
+          <div className="space-y-4">
+            {business.address && (
+              <a
+                href={`https://maps.google.com/?q=${encodeURIComponent(business.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
+              >
+                <MapPin size={24} className="text-primary-sage flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Address</p>
+                  <p className="font-medium text-gray-900 hover:text-primary-sage">{business.address}</p>
+                  {business.zip_code && (
+                    <p className="text-sm text-gray-600">{business.zip_code}</p>
+                  )}
+                </div>
+              </a>
+            )}
+
+            {business.phone && (
+              <a
+                href={`tel:${business.phone}`}
+                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
+              >
+                <Phone size={24} className="text-primary-sage flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Phone</p>
+                  <p className="font-medium text-gray-900 hover:text-primary-sage">{business.phone}</p>
+                </div>
+              </a>
+            )}
+
+            {business.email && (
+              <a
+                href={`mailto:${business.email}`}
+                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
+              >
+                <Mail size={24} className="text-primary-sage flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Email</p>
+                  <p className="font-medium text-gray-900 hover:text-primary-sage break-all">{business.email}</p>
+                </div>
+              </a>
+            )}
+
+            {business.website && (
+              <a
+                href={business.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
+              >
+                <Globe size={24} className="text-primary-sage flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Website</p>
+                  <p className="font-medium text-gray-900 hover:text-primary-sage break-all">{business.website}</p>
+                </div>
+              </a>
+            )}
+          </div>
+        </div>
+
         {/* Photo Gallery */}
         {business.photos && business.photos.length > 0 && (
           <BusinessPhotoGallery photos={business.photos} businessName={business.name} />
@@ -270,123 +302,6 @@ export default function BusinessDetailPage() {
             />
           </div>
         )}
-
-        {/* Contact Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Contact Info */}
-          <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
-
-            <div className="space-y-4">
-              {business.address && (
-                <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(business.address)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-                >
-                  <MapPin size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Address</p>
-                    <p className="font-medium text-gray-900 hover:text-primary-sage">{business.address}</p>
-                    {business.zip_code && (
-                      <p className="text-sm text-gray-600">{business.zip_code}</p>
-                    )}
-                  </div>
-                </a>
-              )}
-
-              {business.phone && (
-                <a
-                  href={`tel:${business.phone}`}
-                  className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-                >
-                  <Phone size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Phone</p>
-                    <p className="font-medium text-gray-900 hover:text-primary-sage">{business.phone}</p>
-                  </div>
-                </a>
-              )}
-
-              {business.email && (
-                <a
-                  href={`mailto:${business.email}`}
-                  className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-                >
-                  <Mail size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Email</p>
-                    <p className="font-medium text-gray-900 hover:text-primary-sage break-all">{business.email}</p>
-                  </div>
-                </a>
-              )}
-
-              {business.website && (
-                <a
-                  href={business.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-3 p-3 rounded hover:bg-gray-50 transition"
-                >
-                  <Globe size={24} className="text-primary-sage flex-shrink-0 mt-1" />
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Website</p>
-                    <p className="font-medium text-gray-900 hover:text-primary-sage break-all">{business.website}</p>
-                  </div>
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Connect With Business</h2>
-
-            <div className="space-y-3">
-              {business.phone && (
-                <a
-                  href={`tel:${business.phone}`}
-                  className="block w-full bg-primary-sage hover:bg-primary-sage-dark text-white font-medium py-3 rounded text-center transition"
-                >
-                  Call Business
-                </a>
-              )}
-
-              {business.address && (
-                <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(business.address)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full bg-accent-500 hover:bg-accent-600 text-white font-medium py-3 rounded text-center transition"
-                >
-                  Get Directions
-                </a>
-              )}
-
-              <Link
-                href={`/quote-request?businessId=${business.id}`}
-                className="block w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 rounded text-center transition"
-              >
-                Request Quote
-              </Link>
-            </div>
-
-            {business.email && (
-              <p className="text-sm text-gray-600 mt-6 pt-6 border-t border-gray-200">
-                Questions? <a href={`mailto:${business.email}`} className="text-primary-sage hover:text-primary-sage-dark font-medium">Send an email</a>
-              </p>
-            )}
-
-            {/* Social Media Links */}
-            {business.socialMedia && business.socialMedia.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-900 mb-3">Follow on Social Media</p>
-                <SocialMediaLinks socialMedia={business.socialMedia} />
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Services Section */}
         {business.services && business.services.length > 0 && (
