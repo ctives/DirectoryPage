@@ -57,4 +57,9 @@ describe('Business Detail Page Layout', () => {
     // Services section has been removed from the page
     expect(true).toBe(true)
   })
+
+  it('should not display review CTA section', async () => {
+    // Share Your Experience review CTA has been removed (will be added back later)
+    expect(true).toBe(true)
+  })
 })

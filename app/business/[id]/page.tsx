@@ -291,17 +291,6 @@ export default function BusinessDetailPage() {
           </div>
         )}
 
-        {/* Review CTA Section */}
-        <div className="bg-gradient-to-r from-primary-sage to-primary-sage-dark rounded-lg shadow-md p-6 md:p-8 text-white">
-          <h2 className="text-2xl font-bold mb-3">Share Your Experience</h2>
-          <p className="mb-6">Have you used this business? Leave a review to help others make informed decisions.</p>
-          <Link
-            href={`/review?businessId=${business.id}&businessName=${encodeURIComponent(business.name)}`}
-            className="inline-block bg-white text-primary-sage hover:bg-gray-100 font-medium py-2 px-6 rounded transition"
-          >
-            Write a Review
-          </Link>
-        </div>
       </div>
     </div>
   )
