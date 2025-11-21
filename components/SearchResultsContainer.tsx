@@ -28,7 +28,7 @@ interface SearchResultsContainerProps {
   isLoading?: boolean
 }
 
-const ITEMS_PER_PAGE = 25
+const ITEMS_PER_PAGE = 10
 
 export default function SearchResultsContainer({
   businesses,
