@@ -1,5 +1,6 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { sendClaimNotificationEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -147,6 +148,33 @@ export async function POST(request: NextRequest) {
 
     if (claimUpdateError) {
       console.error('Error updating claim request:', claimUpdateError)
+    }
+
+    // Get business information for the admin email
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('name')
+      .eq('id', claimRequest.business_id)
+      .single()
+
+    // Send notification email to admin
+    try {
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@cleaningdirectory.com'
+      const approveUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/claims/${claimRequest.id}?action=review`
+      const rejectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/claims/${claimRequest.id}?action=review`
+
+      await sendClaimNotificationEmail({
+        adminEmail: adminEmail,
+        claimantName: `${claimRequest.first_name} ${claimRequest.last_name}`,
+        claimantEmail: claimRequest.email,
+        claimantPhone: claimRequest.phone,
+        businessName: business?.name || 'Unknown Business',
+        approveUrl: approveUrl,
+        rejectUrl: rejectUrl,
+      })
+    } catch (emailError) {
+      console.error('Failed to send admin notification:', emailError)
+      // Don't fail the response, but log the error
     }
 
     return NextResponse.json({
