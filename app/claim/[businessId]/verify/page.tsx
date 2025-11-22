@@ -64,20 +64,19 @@ export default function ClaimVerifyPage() {
 
   const handleResend = async () => {
     setResendCooldown(60)
+    setError('')
     try {
-      const response = await fetch('/api/claim/submit', {
+      const response = await fetch('/api/claim/resend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           businessId,
-          firstName: 'Pending',
-          lastName: 'User',
           email,
-          phone: '',
         }),
       })
+      const data = await response.json()
       if (!response.ok) {
-        setError('Failed to resend code')
+        setError(data.error || 'Failed to resend code')
       }
     } catch (err) {
       setError('Failed to resend code')

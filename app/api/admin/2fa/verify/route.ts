@@ -1,12 +1,13 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-options'
 import { verify2FA } from '@/lib/2fa'
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions as any)
 
     if (!session || session.user?.role !== 'admin') {
       return NextResponse.json(

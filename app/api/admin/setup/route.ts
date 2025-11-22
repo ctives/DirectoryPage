@@ -2,9 +2,34 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 
+/**
+ * Admin Setup Endpoint - Creates initial admin account
+ *
+ * Note: When using curl, be careful with special characters in passwords.
+ * The exclamation mark (!) needs special escaping in bash double-quoted strings.
+ * Use single quotes for the JSON data to avoid shell escaping issues:
+ * curl -X POST http://localhost:3000/api/admin/setup \
+ *   -H "Content-Type: application/json" \
+ *   -d '{"email":"user@example.com","password":"Password123#","setupToken":"your-token"}'
+ */
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, setupToken } = await request.json()
+    // Read the raw text body and parse it
+    const text = await request.text()
+    let body
+    try {
+      body = JSON.parse(text)
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError)
+      console.error('Raw body:', text)
+      console.error('Body length:', text.length)
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
+
+    const { email, password, setupToken } = body
 
     // Verify setup token for security
     if (setupToken !== process.env.ADMIN_SETUP_TOKEN) {

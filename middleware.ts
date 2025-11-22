@@ -20,6 +20,9 @@ const publicRoutes = [
   '/terms',
   '/privacy',
   '/auth/verify-email',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/auth/2fa-verify',
   '/business/:path*', // Public business detail pages
   '/claim/:path*', // Business claiming flow (public, no auth required)
 ]
@@ -69,11 +72,15 @@ export default withAuth(
           return true
         }
 
-        // Allow public API routes (search, business detail, claim, admin setup)
+        // Allow public API routes (search, business detail, claim, admin setup, 2FA verification during login, password reset)
         if (pathname.startsWith('/api/search') ||
             pathname.startsWith('/api/business') ||
             pathname.startsWith('/api/claim') ||
-            pathname === '/api/admin/setup') {
+            pathname === '/api/admin/setup' ||
+            pathname.startsWith('/api/admin/2fa/check') ||
+            pathname.startsWith('/api/admin/2fa/verify-login') ||
+            pathname.startsWith('/api/auth/forgot-password') ||
+            pathname.startsWith('/api/auth/reset-password')) {
           return true
         }
 

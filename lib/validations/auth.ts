@@ -34,6 +34,12 @@ export const LoginSchema = z.object({
     .min(1, 'Password is required'),
 })
 
+export const ForgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .email('Invalid email address'),
+})
+
 export const ResetPasswordSchema = z.object({
   email: z
     .string()
@@ -55,5 +61,6 @@ export const NewPasswordSchema = z.object({
 
 export type SignUpInput = z.infer<typeof SignUpSchema>
 export type LoginInput = z.infer<typeof LoginSchema>
+export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>
 export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>
 export type NewPasswordInput = z.infer<typeof NewPasswordSchema>

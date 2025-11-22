@@ -30,6 +30,17 @@ function LoginPageContent() {
     setError(null)
 
     try {
+      // First, check if 2FA is required for this user
+      const twoFACheckRes = await fetch('/api/admin/2fa/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email }),
+      })
+
+      const twoFACheckData = await twoFACheckRes.json()
+      const requires2FA = twoFACheckData.requiresTwoFA
+
+      // Now sign in with credentials
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
@@ -38,6 +49,12 @@ function LoginPageContent() {
 
       if (!result?.ok) {
         setError(result?.error || 'Failed to login')
+        return
+      }
+
+      // If 2FA is required, redirect to 2FA verification page
+      if (requires2FA) {
+        router.push(`/auth/2fa-verify?email=${encodeURIComponent(data.email)}`)
         return
       }
 
