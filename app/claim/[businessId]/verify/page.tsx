@@ -10,11 +10,19 @@ export default function ClaimVerifyPage() {
   const searchParams = useSearchParams()
   const businessId = params.businessId as string
   const email = searchParams.get('email') || ''
+  const codeFromUrl = searchParams.get('code') || ''
 
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [resendCooldown, setResendCooldown] = useState(0)
+
+  // Auto-populate code from URL if provided
+  useEffect(() => {
+    if (codeFromUrl) {
+      setCode(codeFromUrl)
+    }
+  }, [codeFromUrl])
 
   // Countdown timer for resend
   useEffect(() => {
