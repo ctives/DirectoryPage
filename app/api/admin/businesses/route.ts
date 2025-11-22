@@ -43,8 +43,6 @@ export async function GET(request: NextRequest) {
         email,
         website,
         description,
-        rating,
-        review_count,
         owner_id,
         status,
         created_at
@@ -149,8 +147,6 @@ export async function POST(request: NextRequest) {
         website: website || null,
         description: description || null,
         status: 'active',
-        rating: 0,
-        review_count: 0,
       })
       .select()
       .single()
