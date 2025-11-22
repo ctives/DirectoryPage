@@ -14,16 +14,11 @@ interface Business {
   state: string
   phone: string
   email: string
+  website?: string
+  description?: string
   status: string
-  rating: number
-  review_count: number
   created_at: string
-  users?: {
-    id: string
-    first_name: string
-    last_name: string
-    email: string
-  }
+  updated_at?: string
 }
 
 export default function AdminBusinessesPage() {
@@ -197,10 +192,7 @@ export default function AdminBusinessesPage() {
                       Location
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                      Owner
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-                      Rating
+                      Status
                     </th>
                     <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">
                       Actions
@@ -225,28 +217,13 @@ export default function AdminBusinessesPage() {
                         <p className="text-sm text-gray-500">{business.address}</p>
                       </td>
                       <td className="px-6 py-4">
-                        {business.users ? (
-                          <div>
-                            <p className="text-gray-900">
-                              {business.users.first_name} {business.users.last_name}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {business.users.email}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-gray-500">No owner</p>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1">
-                          <span className="text-gray-900 font-medium">
-                            {business.rating.toFixed(1)}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            ({business.review_count})
-                          </span>
-                        </div>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          business.status === 'active' ? 'bg-green-100 text-green-800' :
+                          business.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {business.status}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex gap-2 justify-end">
