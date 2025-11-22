@@ -69,10 +69,11 @@ export default withAuth(
           return true
         }
 
-        // Allow public API routes (search, business detail, claim)
+        // Allow public API routes (search, business detail, claim, admin setup)
         if (pathname.startsWith('/api/search') ||
             pathname.startsWith('/api/business') ||
-            pathname.startsWith('/api/claim')) {
+            pathname.startsWith('/api/claim') ||
+            pathname === '/api/admin/setup') {
           return true
         }
 
