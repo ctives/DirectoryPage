@@ -38,9 +38,6 @@ export async function GET(
         email,
         website,
         description,
-        rating,
-        review_count,
-        owner_id,
         status,
         created_at,
         updated_at

@@ -43,7 +43,6 @@ export async function GET(request: NextRequest) {
         email,
         website,
         description,
-        owner_id,
         status,
         created_at
       `,
