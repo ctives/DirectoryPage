@@ -1,7 +1,6 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { sendMagicLinkEmail, sendClaimNotificationEmail } from '@/lib/email'
-import crypto from 'crypto'
+import { sendMagicLinkEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -137,25 +136,8 @@ export async function POST(request: NextRequest) {
       // Don't fail the request, but log the error
     }
 
-    // Send notification email to admin
-    try {
-      const adminEmail = process.env.ADMIN_EMAIL || 'admin@cleaningdirectory.com'
-      const approveUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/claims/${claimRequest.id}?action=review`
-      const rejectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/admin/claims/${claimRequest.id}?action=review`
-
-      await sendClaimNotificationEmail({
-        adminEmail: adminEmail,
-        claimantName: `${firstName} ${lastName}`,
-        claimantEmail: email,
-        claimantPhone: phone,
-        businessName: business.name,
-        approveUrl: approveUrl,
-        rejectUrl: rejectUrl,
-      })
-    } catch (emailError) {
-      console.error('Failed to send admin notification:', emailError)
-      // Don't fail the request
-    }
+    // Note: Admin notification email is sent after user verifies their email
+    // (in the verify endpoint) to avoid sending it before email is confirmed
 
     return NextResponse.json({
       success: true,
