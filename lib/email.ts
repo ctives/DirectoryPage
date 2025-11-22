@@ -38,10 +38,12 @@ export const sendMagicLinkEmail = async ({
   email,
   businessName,
   verifyUrl,
+  verificationCode,
 }: {
   email: string
   businessName: string
   verifyUrl: string
+  verificationCode: string
 }) => {
   const subject = 'Verify your email to claim your business'
 
@@ -70,17 +72,24 @@ export const sendMagicLinkEmail = async ({
           </a>
         </div>
 
-        <p style="margin: 30px 0 0 0; color: #6b7280; font-size: 14px;">
-          Or copy and paste this link in your browser:
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+        <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 14px;">
+          Or enter this verification code:
         </p>
-        <p style="margin: 8px 0 0 0; color: #667eea; font-size: 12px; word-break: break-all;">
-          ${verifyUrl}
-        </p>
+        <div style="text-align: center; margin: 20px 0; background: white; padding: 20px; border-radius: 6px; border: 2px solid #667eea;">
+          <p style="margin: 0; font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px;">
+            ${verificationCode}
+          </p>
+          <p style="margin: 10px 0 0 0; color: #9ca3af; font-size: 12px;">
+            Enter this code on the verification page
+          </p>
+        </div>
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
 
         <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-          This link will expire in 24 hours. If you didn't request this, please ignore this email.
+          This code will expire in 24 hours. If you didn't request this, please ignore this email.
         </p>
       </div>
     </div>

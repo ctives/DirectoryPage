@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
         email: email,
         businessName: business.name,
         verifyUrl: verifyUrl,
+        verificationCode: verificationCode,
       })
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError)
