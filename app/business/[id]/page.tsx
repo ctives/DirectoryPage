@@ -3,18 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
 import { MapPin, Phone, Mail, Globe, ArrowLeft, Shield, Check } from 'lucide-react'
 import BusinessPhotoGallery from '@/components/BusinessPhotoGallery'
 import RatingBadges from '@/components/RatingBadges'
-import SocialMediaLinks from '@/components/SocialMediaLinks'
 import ClaimBusinessBanner from '@/components/ClaimBusinessBanner'
-
-// Dynamically import map to avoid SSR issues
-const BusinessDetailMap = dynamic(
-  () => import('@/components/BusinessDetailMap'),
-  { ssr: false, loading: () => <div className="w-full h-96 bg-gray-100 flex items-center justify-center rounded-lg">Loading map...</div> }
-)
 
 interface Photo {
   id: string
@@ -285,17 +277,6 @@ export default function BusinessDetailPage() {
         {/* Photo Gallery */}
         {business.photos && business.photos.length > 0 && (
           <BusinessPhotoGallery photos={business.photos} businessName={business.name} />
-        )}
-
-        {/* Map Section */}
-        {business.latitude && business.longitude && (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-            <BusinessDetailMap
-              latitude={business.latitude}
-              longitude={business.longitude}
-              businessName={business.name}
-            />
-          </div>
         )}
 
       </div>
